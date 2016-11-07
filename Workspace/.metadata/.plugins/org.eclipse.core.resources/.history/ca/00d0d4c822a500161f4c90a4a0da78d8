@@ -1,0 +1,5 @@
+
+logging:
+  level: INFO
+  loggers:
+    com.soen343: DEBUG

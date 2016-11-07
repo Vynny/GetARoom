@@ -1,0 +1,8 @@
+server:
+  rootPath: /api/*  # Default is /*
+
+
+logging:
+  level: INFO
+  loggers:
+    com.soen343: DEBUG

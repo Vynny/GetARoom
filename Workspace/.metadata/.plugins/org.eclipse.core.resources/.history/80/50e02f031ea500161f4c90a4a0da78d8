@@ -1,0 +1,16 @@
+package com.soen343;
+
+import io.dropwizard.Configuration;
+
+public class GetARoomConfiguration extends Configuration /*implements
+AssetsBundleConfiguration*/ {
+  /*  @NotNull
+    @JsonProperty
+    private final AssetsConfiguration assets = ;
+
+    @Override
+    public AssetsConfiguration getAssetsConfiguration() {
+        return assets;
+    }*/
+}
+

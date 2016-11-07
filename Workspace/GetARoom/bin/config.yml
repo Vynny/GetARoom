@@ -1,0 +1,11 @@
+http:
+  rootPath: /api/*  # Default is /*
+
+assets:
+  overrides:
+    /: src/main/resources/assets/
+
+logging:
+  level: INFO
+  loggers:
+    com.soen343: DEBUG
