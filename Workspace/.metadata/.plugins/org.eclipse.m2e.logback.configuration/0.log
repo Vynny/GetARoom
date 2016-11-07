@@ -535,3 +535,24 @@
 2016-11-07 15:11:39,162 [Worker-89] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
 2016-11-07 15:11:58,325 [Worker-90] INFO  o.e.m.i.launch.MavenLaunchDelegate - C:\Users\Sylvain\Documents\Programming\School\SOEN343Project\Workspace\GetARoom
 2016-11-07 15:11:58,331 [Worker-90] INFO  o.e.m.i.launch.MavenLaunchDelegate -  mvn -B package
+2016-11-07 15:42:41,009 [Worker-1] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2016-11-07 15:42:47,911 [Worker-3] INFO  o.e.m.c.i.l.LifecycleMappingFactory - Using org.eclipse.m2e.jdt.JarLifecycleMapping lifecycle mapping for MavenProject: com.soen343:getaroom:1.0-SNAPSHOT @ C:\Users\mihai\OneDrive\Documents\GitHub\SOEN343Project\Workspace\GetARoom\pom.xml.
+2016-11-07 15:42:51,024 [Worker-3] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2016-11-07 15:42:51,035 [Worker-3] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 57 resources
+2016-11-07 15:42:52,425 [Worker-1] INFO  o.e.m.c.i.l.LifecycleMappingFactory - Using org.eclipse.m2e.jdt.JarLifecycleMapping lifecycle mapping for MavenProject: com.soen343:getaroom:1.0-SNAPSHOT @ C:\Users\mihai\OneDrive\Documents\GitHub\SOEN343Project\Workspace\GetARoom\pom.xml.
+2016-11-07 15:42:53,460 [Worker-3] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2016-11-07 15:42:53,461 [Worker-3] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\Users\mihai\OneDrive\Documents\GitHub\SOEN343Project\Workspace\GetARoom\src\test\resources
+2016-11-07 15:42:55,623 [Worker-12] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2016-11-07 15:42:55,627 [Worker-12] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
+2016-11-07 15:42:55,633 [Worker-12] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2016-11-07 15:42:55,633 [Worker-12] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\Users\mihai\OneDrive\Documents\GitHub\SOEN343Project\Workspace\GetARoom\src\test\resources
+2016-11-07 15:43:02,827 [Worker-2] INFO  o.e.m.c.i.p.ProjectConfigurationManager - Update started
+2016-11-07 15:43:03,732 [Worker-2] INFO  o.e.m.c.i.l.LifecycleMappingFactory - Using org.eclipse.m2e.jdt.JarLifecycleMapping lifecycle mapping for MavenProject: com.soen343:getaroom:1.0-SNAPSHOT @ C:\Users\mihai\OneDrive\Documents\GitHub\SOEN343Project\Workspace\GetARoom\pom.xml.
+2016-11-07 15:43:04,597 [Worker-2] INFO  o.e.m.j.i.AbstractJavaProjectConfigurator - Adding source folder /GetARoom/src/main/java
+2016-11-07 15:43:04,599 [Worker-2] INFO  o.e.m.j.i.AbstractJavaProjectConfigurator - Adding resource folder /GetARoom/src/main/resources
+2016-11-07 15:43:04,601 [Worker-2] INFO  o.e.m.j.i.AbstractJavaProjectConfigurator - Adding source folder /GetARoom/src/test/java
+2016-11-07 15:43:04,925 [Worker-2] INFO  o.e.m.c.i.p.ProjectConfigurationManager - Update completed: 2 sec
+2016-11-07 15:43:05,728 [Worker-19] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2016-11-07 15:43:05,730 [Worker-19] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 57 resources
+2016-11-07 15:43:06,440 [Worker-19] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2016-11-07 15:43:06,447 [Worker-19] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\Users\mihai\OneDrive\Documents\GitHub\SOEN343Project\Workspace\GetARoom\src\test\resources
