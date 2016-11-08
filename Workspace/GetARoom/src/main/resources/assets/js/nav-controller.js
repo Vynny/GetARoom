@@ -8,8 +8,13 @@ angular.module('navController', [])
 			if (url === '#') return false;
 			return ('#' + $state.$current.url.source + '/').indexOf(url + '/') === 0;
 		};
+		$scope.test = "Test";
+		$scope.rooms = [];
+		for (i = 1; i < 10; i ++) {
+			$scope.rooms.push({name: "Room " + i})
+		}
 
-		$scope.pages = [
+		/*$scope.pages = [
 			{
 				name: 'Home',
 				url: '#/'
@@ -56,5 +61,5 @@ angular.module('navController', [])
 					}
 				]
 			}
-		]
+		]*/
 	});
