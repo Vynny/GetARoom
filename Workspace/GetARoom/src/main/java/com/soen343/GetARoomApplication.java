@@ -16,6 +16,7 @@ public class GetARoomApplication extends Application<GetARoomConfiguration> {
 
 	public static void main(final String[] args) throws Exception {
 		new GetARoomApplication().run(args);
+		//This is a test comment
 	}
 
 	@Override
