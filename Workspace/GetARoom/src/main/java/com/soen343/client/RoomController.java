@@ -50,5 +50,6 @@ public class RoomController {
         } else {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
+    	//Room room = new Room(0, "Test Room");
     }
 }

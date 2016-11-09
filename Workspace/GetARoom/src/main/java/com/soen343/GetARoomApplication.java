@@ -4,6 +4,10 @@ import org.skife.jdbi.v2.DBI;
 
 import com.soen343.client.RoomController;
 import com.soen343.db.RoomTDG;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.soen343.client.ReservationController;
+import com.soen343.db.ReservationTDG;
+
 
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
@@ -36,11 +40,16 @@ public class GetARoomApplication extends Application<GetARoomConfiguration> {
 		((DefaultServerFactory) configuration.getServerFactory()).setJerseyRootPath("/api/*");
 
 		final DBIFactory factory = new DBIFactory();
+		environment.getObjectMapper().configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		final DBI jdbi = factory.build(environment, configuration.getDataSourceFactory(), "database");
 		
-		final RoomTDG roomTDG = jdbi.onDemand(RoomTDG.class);
 		
+		final RoomTDG roomTDG = jdbi.onDemand(RoomTDG.class);
+		final ReservationTDG reservationTDG = jdbi.onDemand(ReservationTDG.class);
+		
+		ReservationController reservationController = new ReservationController(reservationTDG);
 		RoomController roomController = new RoomController(roomTDG);
+		environment.jersey().register(reservationController);
 	    environment.jersey().register(roomController);
 	}
 

@@ -6,7 +6,7 @@ database:
   user: soen343
 
   # the password
-  password: soen343
+  password: pass
 
   # the JDBC URL
   url: jdbc:mysql://localhost/getaroom
