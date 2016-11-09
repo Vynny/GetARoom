@@ -17,7 +17,7 @@ public class ReservationMapper {
 	}
 
 	public Reservation get(int id) {
-		logger.info("Got reservation with start time: " + reservationTDG.findById(id).getStart_time());
+		logger.info("Got reservation");
 		return reservationTDG.findById(id);
 	}
 

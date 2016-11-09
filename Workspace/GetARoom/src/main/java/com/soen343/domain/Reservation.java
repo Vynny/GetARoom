@@ -1,12 +1,16 @@
 package com.soen343.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 
 public class Reservation {
 	private long id;
 	private boolean waitlisted;
-	private String start_time;
-	private String end_time;
+	private DateTime start_time;
+	private DateTime end_time;
+	//private String start_time;
+	//private String end_time;
 
 	public Reservation() {
 		// Jackson deserialization
@@ -15,8 +19,8 @@ public class Reservation {
 	public Reservation(long id, boolean waitlisted, String start_time, String end_time) {
 		this.id = id;
 		this.waitlisted = waitlisted;
-		this.start_time = start_time;
-		this.end_time = end_time;		
+		this.start_time = DateTime.parse(start_time, ISODateTimeFormat.dateHourMinute());
+		this.end_time = DateTime.parse(end_time, ISODateTimeFormat.dateHourMinute());
 	}
 	
 	@JsonProperty
@@ -30,12 +34,12 @@ public class Reservation {
 	}
 
 	@JsonProperty
-	public String getStart_time() {
+	public DateTime getStart_time() {
 		return start_time;
 	}
 
 	@JsonProperty
-	public String getEnd_time() {
+	public DateTime getEnd_time() {
 		return end_time;
 	}
 }
