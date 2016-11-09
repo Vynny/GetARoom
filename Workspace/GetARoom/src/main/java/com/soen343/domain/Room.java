@@ -2,12 +2,12 @@ package com.soen343.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Room {
+public class Room implements DomainObject {
 	private long id;
 	private String description;
 
 	public Room() {
-		// Jackson deserialization
+		
 	}
 
 	public Room(long id, String description) {

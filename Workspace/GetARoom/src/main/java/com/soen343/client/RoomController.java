@@ -1,5 +1,7 @@
 package com.soen343.client;
 
+import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -12,6 +14,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.soen343.core.RoomMapper;
 import com.soen343.db.RoomTDG;
 import com.soen343.domain.Room;
+import com.soen343.mappers.RoomIdentityMap;
 
 @Path("/room")
 @Produces(MediaType.APPLICATION_JSON)
@@ -22,7 +25,19 @@ public class RoomController {
 
     public RoomController(RoomTDG roomTDG) {
     	this.roomTDG = roomTDG;
-    	roomMapper = new RoomMapper(roomTDG);
+    	this.roomMapper = new RoomMapper(roomTDG);
+    }
+    
+    @GET
+    @Path("/")
+    @Timed
+    public List<Room> getAllRooms() {
+    	List<Room> rooms = roomMapper.getAll();
+    	if (rooms != null) {
+            return rooms;
+        } else {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
     }
 
     @GET
