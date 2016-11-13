@@ -1,28 +1,6 @@
 (function() {
-	var app = angular.module('app', ['ui.router', 'navController', 'ngAnimate', 'ui.bootstrap'])
-
-	// define for requirejs loaded modules
-	define('app', [], function() { return app; });
-
-	// function for dynamic load with requirejs of a javascript module for use with a view
-	// in the state definition call add property `resolve: req('/views/ui.js')`
-	// or `resolve: req(['/views/ui.js'])`
-	// or `resolve: req('views/ui')`
-	function req(deps) {
-		if (typeof deps === 'string') deps = [deps];
-		return {
-			deps: function ($q, $rootScope) {
-				var deferred = $q.defer();
-				require(deps, function() {
-					$rootScope.$apply(function () {
-						deferred.resolve();
-					});
-					deferred.resolve();
-				});
-				return deferred.promise;
-			}
-		}
-	}
+	var app = angular.module('app', ['ui.router', 'ngAnimate', 'ui.bootstrap', 'ngResource', 'ui.calendar', 'mainController'])
+	var apisrc = "http://localhost:8080";
 
 	app.config(function($stateProvider, $urlRouterProvider, $controllerProvider){
 		var origController = app.controller
@@ -44,19 +22,30 @@
 				data: {
 					pageTitle: 'Home'
 				}
-			})
-			.state('about', {
-				url: "/about",
-				templateUrl: viewsPrefix + "about.html",
+			}).state('rooms', {
+				url: "/rooms",
+				templateUrl: viewsPrefix + "rooms.html",
+				controller: 'RoomsCtrl',
 				data: {
-					pageTitle: 'About'
+					pageTitle: 'All Rooms'
 				}
 			})
-			.state('contact', {
-				url: "/contact",
-				templateUrl: viewsPrefix + "contact.html",
+			.state('rooms.room', {
+				url: "/:id",
+				//templateUrl: viewsPrefix + "room.html",
+				views: {
+					'@': {
+						templateUrl: viewsPrefix + "room.html",
+						controller: 'RoomCtrl'
+					}
+				},
 				data: {
-					pageTitle: 'Contact'
+					pageTitle: 'Room'
+				},
+				resolve: {
+					id: function($stateParams) {
+						return $stateParams.id;
+					}
 				}
 			})
 			.state('contact.list', {
@@ -89,13 +78,12 @@
 			})
 			.state('ui', {
 				url: "/ui",
-				resolve: req('/views/ui.js'),
 				templateUrl: viewsPrefix + "ui.html",
 				data: {
 					pageTitle: 'UI'
 				}
 			})
-	})
+		})
 	.directive('updateTitle', ['$rootScope', '$timeout',
 		function($rootScope, $timeout) {
 			return {
@@ -112,5 +100,7 @@
 				}
 			};
 		}
-	]);
-}());
+		]).factory("Room", function($resource) {
+			return $resource(apisrc + "/api/room/:id", {id: "@id"});
+		});
+	}());
