@@ -5,8 +5,8 @@
 	<meta charset="utf-8">
 	<title>GetaRoom!</title>
 	<link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700|Lato:400,100,300,700,900' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" href="css/animate.css">
-	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/Mihaianimate.css">
+	<link rel="stylesheet" href="css/Mihaistyle.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 </head>
 
@@ -19,7 +19,7 @@
 			<div class="box-header">
 				<h2>Log In</h2>
 			</div>
-		<form name="myForm" action="Login.jar">
+		<form name="myForm" id='login' method='post' action="Login.java">
 		<div class="container">
 			<label for="username">Username</label>
 			<br/>
@@ -29,7 +29,7 @@
 			<br/>
 			<input type="password" name="dasPassword" id="password" placeholder="Enter Password here" required>
 			<br/>
-			<button type="submit">Login</button>
+			<button type="submit" value="login">Login</button>
 			<input type="checkbox" checked="checked">Remember me
 			<br/>
 		</div>

@@ -58,6 +58,12 @@
                     data: {
                         pageTitle: 'Reserve'
                     }
+                }).state('userpanel', {
+                    url: "/userpanel",
+                    templateUrl: viewsPrefix + "userpanel.html",
+                    data: {
+                        pageTitle: 'User Panel'
+                    }
                 })
                 .state('contact.list', {
                     url: "/list",
@@ -106,7 +112,6 @@
                                 element.text(title);
                             }, 0, false);
                         };
-
                         $rootScope.$on('$stateChangeSuccess', listener);
                     }
                 };
