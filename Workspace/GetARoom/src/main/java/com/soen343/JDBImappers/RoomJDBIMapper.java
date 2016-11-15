@@ -1,4 +1,4 @@
-package com.soen343.core;
+package com.soen343.JDBImappers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.tweak.ResultSetMapper;
 
-import com.soen343.domain.Room;
+import com.soen343.core.Room;
 
 public class RoomJDBIMapper implements ResultSetMapper<Room> {
 

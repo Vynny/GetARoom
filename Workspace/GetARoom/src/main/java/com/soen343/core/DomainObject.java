@@ -1,4 +1,4 @@
-package com.soen343.domain;
+package com.soen343.core;
 
 public interface DomainObject {
 

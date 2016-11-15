@@ -1,9 +1,9 @@
-package com.soen343.mappers;
+package com.soen343.idmappers;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import com.soen343.domain.DomainObject;
+import com.soen343.core.DomainObject;
 
 public class IdentityMap {
 

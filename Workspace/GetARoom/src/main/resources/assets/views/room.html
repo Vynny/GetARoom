@@ -1,15 +1,28 @@
-<div class="container">
+<div id="room-page" class="container">
   <div class="row">
-    <div class="col-12">
-      <div class="page-header">
-      <h1>{{thisroom.description}}</h1>
+
+    <div class="col-md-12">
+      <div class="row">
+        <!-- <div class="page-header"> -->
+        <div class="col-md-4">
+          <h1>View: {{thisroom.description}}</h1>
+        </div>
+        <div class="col-md-offset-4 col-md-4 reserve-button">
+          <button ui-sref="rooms.room.reserve" type="button" class="btn btn-success">Reserve This Room</button>
+        </div>
+        <!-- </div> -->
       </div>
       <div class="well">
         <div class="starter-template">
-          <h1>Schedule</h1>
-          <div ui-calendar="uiConfig.calendar" ng-model="eventSources"></div>
+          <!-- <h1>Schedule</h1> -->
+          <div class="row">
+            <div class="col-md-12">
+              <div ui-calendar="uiConfig.calendar" ng-model="eventSources"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
   </div>
 </div><!-- /.container -->
