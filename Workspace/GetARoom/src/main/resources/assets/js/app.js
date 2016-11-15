@@ -1,6 +1,6 @@
 (function() {
 	var app = angular.module('app', ['ui.router', 'ngAnimate', 'ui.bootstrap', 'ngResource', 'ui.calendar', 'mainController'])
-	var apisrc = "http://localhost:8080";
+	var apisrc = "http://getaroom.lvain.com";
 
 	app.config(function($stateProvider, $urlRouterProvider, $controllerProvider){
 		var origController = app.controller
@@ -22,12 +22,20 @@
 				data: {
 					pageTitle: 'Home'
 				}
-			}).state('rooms', {
+			})
+			.state('rooms', {
 				url: "/rooms",
 				templateUrl: viewsPrefix + "rooms.html",
 				controller: 'RoomsCtrl',
 				data: {
 					pageTitle: 'All Rooms'
+				}
+			})
+			.state('userpanel', {
+				url: "/userpanel",
+				templateUrl: viewsPrefix + "userpanel.html",
+				data: {
+					pageTitle: 'User Panel'
 				}
 			})
 			.state('rooms.room', {
