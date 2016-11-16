@@ -8,7 +8,7 @@
           <h1>View: {{thisroom.description}}</h1>
         </div>
         <div class="col-md-offset-4 col-md-4 reserve-button">
-          <button ui-sref="rooms.room.reserve" type="button" class="btn btn-success">Reserve This Room</button>
+          <button ng-hide="hideReservationButton" ui-sref="rooms.room.reserve({date: reserveDayObj})" type="button" class="btn btn-success">Reserve This Room On {{reserveDay}}</button>
         </div>
         <!-- </div> -->
       </div>
