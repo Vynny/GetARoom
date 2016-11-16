@@ -1,4 +1,4 @@
-package com.soen343.domain;
+package com.soen343.core;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

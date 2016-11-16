@@ -1,14 +1,18 @@
-package com.soen343.core;
+package com.soen343.uow;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.soen343.domain.DomainObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.soen343.core.DomainObject;
 import com.soen343.mappers.Mapper;
 
 public class UnitOfWork {
-
+	final Logger logger = LoggerFactory.getLogger(UnitOfWork.class);
+	
 	private List<DomainObject> dirtyDomainObjects;
 	private List<DomainObject> newDomainObjects;
 	private List<DomainObject> deletedDomainObjects;
@@ -26,14 +30,15 @@ public class UnitOfWork {
 	}
 
 	public void registerNew(DomainObject newObj) {
-		dirtyDomainObjects.add(newObj);
+		newDomainObjects.add(newObj);
 	}
 
 	public void registerDeleted(DomainObject deletedObj) {
-		dirtyDomainObjects.add(deletedObj);
+		deletedDomainObjects.add(deletedObj);
 	}
 
 	public void commit() {
+		logger.info("Issuing commit operation");
 		updateDirty();
 		updateNew();
 		updateDeleted();
@@ -48,7 +53,7 @@ public class UnitOfWork {
 	}
 
 	private void updateNew() {
-		Iterator<DomainObject> it = deletedDomainObjects.iterator();
+		Iterator<DomainObject> it = newDomainObjects.iterator();
 		while (it.hasNext()) {
 			DomainObject obj = it.next();
 			dataMapper.create(obj);

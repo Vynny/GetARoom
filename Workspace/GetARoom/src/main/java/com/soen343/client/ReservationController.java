@@ -9,9 +9,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.codahale.metrics.annotation.Timed;
-import com.soen343.core.ReservationMapper;
+import com.soen343.core.Reservation;
 import com.soen343.db.ReservationTDG;
-import com.soen343.domain.Reservation;
+import com.soen343.mappers.ReservationMapper;
 
 @Path("/reservation")
 @Produces(MediaType.APPLICATION_JSON)
@@ -35,5 +35,12 @@ public class ReservationController {
         } else {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
+    }
+    
+    @GET
+    @Path("/createtest")
+    @Timed
+    public void test() {
+    	reservationMapper.makeNew(1, 1, false, "2016-11-14T08:00", "2016-11-14T10:00");
     }
 }

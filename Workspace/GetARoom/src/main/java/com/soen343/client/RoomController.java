@@ -11,10 +11,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.codahale.metrics.annotation.Timed;
-import com.soen343.core.RoomMapper;
+import com.soen343.core.Room;
 import com.soen343.db.RoomTDG;
-import com.soen343.domain.Room;
-import com.soen343.mappers.RoomIdentityMap;
+import com.soen343.idmappers.RoomIdentityMap;
+import com.soen343.mappers.RoomMapper;
 
 @Path("/room")
 @Produces(MediaType.APPLICATION_JSON)

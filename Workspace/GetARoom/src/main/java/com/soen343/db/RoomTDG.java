@@ -8,15 +8,12 @@ import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
 
-import com.soen343.core.RoomJDBIMapper;
-import com.soen343.domain.Room;
+import com.soen343.JDBImappers.RoomJDBIMapper;
+import com.soen343.core.Room;
 
 @RegisterMapper(RoomJDBIMapper.class)
 public interface RoomTDG {
-
-	/*@SqlUpdate("create table Room (id int auto_increment primary key, description varchar(80))")
-	void createPersonTable();*/
-
+	
 	@SqlUpdate("insert into Room (description) values (:description)")
 	void insert(@BindBean Room room);
 

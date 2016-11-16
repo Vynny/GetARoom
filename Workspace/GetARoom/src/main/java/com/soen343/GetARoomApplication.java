@@ -25,7 +25,6 @@ public class GetARoomApplication extends Application<GetARoomConfiguration> {
 
 	public static void main(final String[] args) throws Exception {
 		new GetARoomApplication().run(args);
-		//This is a test comment
 	}
 
 	@Override
@@ -35,27 +34,32 @@ public class GetARoomApplication extends Application<GetARoomConfiguration> {
 
 	@Override
 	public void initialize(final Bootstrap<GetARoomConfiguration> bootstrap) {
-		// TODO: application initialization
 		bootstrap.addBundle(new AssetsBundle("/assets/", "/", "index.html"));
 	}
 
 	@Override
 	public void run(final GetARoomConfiguration configuration, final Environment environment) {
-		// TODO: implement application
+		//Set root path to /api/*
 		((DefaultServerFactory) configuration.getServerFactory()).setJerseyRootPath("/api/*");
 
+		//Database Initialization
 		final DBIFactory factory = new DBIFactory();
 		environment.getObjectMapper().configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		final DBI jdbi = factory.build(environment, configuration.getDataSourceFactory(), "database");
 		
-		
+		//TDG Initialization
 		final RoomTDG roomTDG = jdbi.onDemand(RoomTDG.class);
 		final ReservationTDG reservationTDG = jdbi.onDemand(ReservationTDG.class);
 		
-		ReservationController reservationController = new ReservationController(reservationTDG);
+		//Controller Initialization
 		RoomController roomController = new RoomController(roomTDG);
+		ReservationController reservationController = new ReservationController(reservationTDG);
+		
+		//Controller Registration
 		environment.jersey().register(reservationController);
 	    environment.jersey().register(roomController);
+	    
+	    //Configure Cross Origin Resource Sharing
 	    configureCors(environment);
 	}
 	

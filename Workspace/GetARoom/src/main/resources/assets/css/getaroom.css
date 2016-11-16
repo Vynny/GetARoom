@@ -2,8 +2,8 @@
  * Base structure
  */
 
-/* Move down content because we have a fixed navbar that is 50px tall */
-body {
+ /* Move down content because we have a fixed navbar that is 50px tall */
+ body {
   padding-top: 50px;
 }
 
@@ -12,7 +12,7 @@ body {
  * Global add-ons
  */
 
-.sub-header {
+ .sub-header {
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;
 }
@@ -21,7 +21,7 @@ body {
  * Top navigation
  * Hide default border to remove 1px line.
  */
-.navbar-fixed-top {
+ .navbar-fixed-top {
   border: 0;
 }
 
@@ -29,8 +29,8 @@ body {
  * Sidebar
  */
 
-/* Hide for mobile, show later */
-.sidebar {
+ /* Hide for mobile, show later */
+ .sidebar {
   display: none;
 }
 @media (min-width: 768px) {
@@ -71,7 +71,7 @@ body {
  * Main content
  */
 
-.main {
+ .main {
   padding: 20px;
 }
 @media (min-width: 768px) {
@@ -89,7 +89,7 @@ body {
  * Placeholder dashboard ideas
  */
 
-.placeholders {
+ .placeholders {
   margin-bottom: 30px;
   text-align: center;
 }
@@ -103,3 +103,30 @@ body {
   display: inline-block;
   border-radius: 50%;
 }
+
+/* Room Page */
+#room-page {
+
+}
+
+.reserve-button {
+  text-align: right;
+  margin-top: 22px;
+}
+
+/* Reserve Page */
+#reservation-view {
+  margin: 20px 0;
+  padding: 10px;
+  background-color: #f5f5f5;
+}
+
+#reserve-confirm {
+  text-align: center;
+  transform: translateY(80%);
+}
+
+#reserve-confirm button {
+
+}
+

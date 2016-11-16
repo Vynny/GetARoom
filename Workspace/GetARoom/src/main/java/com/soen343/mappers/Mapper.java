@@ -1,10 +1,10 @@
 package com.soen343.mappers;
 
-public interface Mapper {
+public interface Mapper<T> {
 
-	void save(Object o);
+	void save(T o);
 
-	void create(Object o);
+	void create(T o);
 	
-	void delete(Object o);
+	void delete(T o);
 }
