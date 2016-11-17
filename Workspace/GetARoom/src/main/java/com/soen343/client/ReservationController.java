@@ -1,5 +1,7 @@
 package com.soen343.client;
 
+import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -32,6 +34,30 @@ public class ReservationController {
     	Reservation reservation = reservationMapper.get(id);
     	if (reservation != null) {
             return reservation;
+        } else {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+    }
+    
+    @GET
+    @Path("/getbyroom/{id}")
+    @Timed
+    public List<Reservation> getReservationByRoom(@PathParam("id") Integer id) {
+    	List<Reservation> reservations = reservationMapper.getByRoom(id);
+    	if (!reservations.isEmpty()) {
+            return reservations;
+        } else {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+    }
+
+    @GET
+    @Path("/getbyuser/{id}")
+    @Timed
+    public List<Reservation> getReservationByUser(@PathParam("id") Integer id) {
+    	List<Reservation> reservations = reservationMapper.getByUser(id);
+    	if (!reservations.isEmpty()) {
+            return reservations;
         } else {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
