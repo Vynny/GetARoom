@@ -1,6 +1,6 @@
 (function() {
-    var app = angular.module('app', ['ui.router', 'ngAnimate', 'ui.bootstrap', 'ngResource', 'ui.calendar', 'getaroom.services', 'mainController'])
-    var apisrc = "http://getaroom.lvain.com";
+    var app = angular.module('app', ['ui.router', 'ngAnimate', 'ui.bootstrap', 'ngResource', 'ui.calendar', 'getaroom.services', 'mainController', 'ngStorage'])
+    var apisrc = "http://localhost:8080";
 
     app.config(function($stateProvider, $urlRouterProvider, $controllerProvider) {
             var origController = app.controller
@@ -56,28 +56,24 @@
                         }
                     },
                     data: {
-                       pageTitle: 'Reserve'
+                        pageTitle: 'Reserve'
                     },
                     params: {
                         date: null
-                    }/*,
-                    resolve: {
-                        date: function($stateParams) {
-                            return $stateParams.date;
-                        }
-                    }*/
+                    }
                 }).state('userpanel', {
                     url: "/userpanel",
                     templateUrl: viewsPrefix + "userpanel.html",
                     data: {
                         pageTitle: 'User Panel'
                     }
-                })
-                .state('contact.list', {
-                    url: "/list",
-                    templateUrl: viewsPrefix + "contact-list.html",
-                    controller: function($scope) {
-                        $scope.things = ["A", "Set", "Of", "Things"];
+                }).state('login', {
+                    url: "/login",
+                    controller: 'LoginCtrl',
+                    templateUrl: viewsPrefix + "login.html",
+                    data: {
+                        pageTitle: 'Log In',
+                        apisrc: apisrc
                     }
                 })
                 .state('theme', {
@@ -87,20 +83,6 @@
                         pageTitle: 'Theme Example'
                     }
                 })
-                .state('blog', {
-                    url: "/blog",
-                    templateUrl: viewsPrefix + "blog.html",
-                    data: {
-                        pageTitle: 'Blog'
-                    }
-                })
-                .state('grid', {
-                    url: "/grid",
-                    templateUrl: viewsPrefix + "grid.html",
-                    data: {
-                        pageTitle: 'Grid'
-                    }
-                })
                 .state('ui', {
                     url: "/ui",
                     templateUrl: viewsPrefix + "ui.html",
@@ -108,6 +90,24 @@
                         pageTitle: 'UI'
                     }
                 })
+        }).run(function($rootScope, $http, $location, $localStorage) {
+            //Keep user logged in between page refreshes
+            if ($localStorage.currentUser) {
+                $http.defaults.headers.common.Authorization = 'Bearer ' + $localStorage.currentUser.token;
+            }
+
+            //If non logged in user tries to access restricted page, deny request
+            $rootScope.$on('$locationChangeStart', function(event, next, current) {
+                var loginPage = ['/login'];
+                var publicPages = ['/login'];
+                var restrictedPage = publicPages.indexOf($location.path()) === -1;
+                if (restrictedPage && !$localStorage.currentUser) {
+                    $location.path('/login');
+                }
+                if (loginPage && $localStorage.currentUser) {
+                    $location.path('/');
+                }
+            });
         })
         .directive('updateTitle', ['$rootScope', '$timeout',
             function($rootScope, $timeout) {
@@ -126,5 +126,7 @@
             }
         ]).factory("Room", function($resource) {
             return $resource(apisrc + "/api/room/:id", { id: "@id" });
+        }).factory("User", function($resource) {
+            return $resource(apisrc + "/api/user/:id", { id: "@id" });
         });
 }());

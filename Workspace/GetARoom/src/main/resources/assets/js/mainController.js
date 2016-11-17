@@ -12,6 +12,32 @@ angular.module('mainController', [])
         $scope.rooms = Room.query(function() { /*console.log(JSON.stringify($scope.rooms));*/ });
 
 
+    }).controller('LoginCtrl', function($scope, $state, $rootScope, $http, $localStorage) {
+        $rootScope.showSidebar = true;
+        $scope.statusMessage;
+        $scope.apisrc = $state.current.data.apisrc;
+
+        $scope.loginButton = function() {
+             $http.get($scope.apisrc + '/api/user/login?username=' + $scope.user.name + '&password=' + $scope.user.password)
+                .success(function (response) {
+                    console.log(JSON.stringify(response));
+                    //Login Success
+                    if (response.token) {
+                        //Persist user into local storage
+                        $localStorage.currentUser = { username: $scope.user.name, token: response.token };
+
+                        //Set Authorization headers for user requests
+                        $http.defaults.headers.common.Authorization = 'Bearer ' + response.token;
+
+                        //Show sidebar and redirect to home view
+                        $rootScope.showSidebar = false;
+                        $state.go("home")
+                    } else {
+                        $scope.statusMessage = "Login Failed!";
+                    }
+                });
+        };
+        //Controller for all rooms page 
     }).controller('RoomsCtrl', function($scope, $state, $resource, Room) {
         //Controller for all rooms page 
     }).controller('RoomCtrl', function($scope, $state, $resource, id, RoomService) {
