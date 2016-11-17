@@ -1,12 +1,15 @@
 package com.soen343.auth;
 
 import java.util.Optional;
+
+import org.jose4j.jwt.MalformedClaimException;
+import org.jose4j.jwt.consumer.JwtContext;
+
 import com.soen343.core.*;
 import com.soen343.client.UserController;
 import io.dropwizard.auth.*;
-import io.dropwizard.auth.basic.*;
 
-public class GetARoomAuthenticator implements Authenticator<BasicCredentials, User>{
+public class GetARoomAuthenticator implements Authenticator<JwtContext, User>{
 	private UserController controller;
 	
 	public GetARoomAuthenticator(UserController controller) {
@@ -14,12 +17,18 @@ public class GetARoomAuthenticator implements Authenticator<BasicCredentials, Us
 	}
 	
 	@Override
-	public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {
-		User session = controller.getUserByName(credentials.getUsername());
-		
-		if (session != null && session.getPassword().equals(credentials.getPassword())) {
-			return Optional.of(session);
-		}
-		return Optional.empty();
+	public Optional<User> authenticate(JwtContext context) throws AuthenticationException {
+        try {
+            final String subject = context.getJwtClaims().getSubject();
+            User session = controller.getUser(Integer.parseInt(subject));
+            
+            if (session != null) {
+            	return Optional.of(session);
+            }
+            return Optional.empty();
+        }
+        catch (MalformedClaimException e) {
+        	return Optional.empty();
+        }
 	}
 }

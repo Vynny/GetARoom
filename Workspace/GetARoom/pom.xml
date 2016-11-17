@@ -53,6 +53,11 @@
 			<artifactId>dropwizard-auth</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+		<dependency>
+	    <groupId>com.github.toastshaman</groupId>
+			<artifactId>dropwizard-auth-jwt</artifactId>
+			<version>1.0.0-0</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
 		<dependency>
 			<groupId>mysql</groupId>
