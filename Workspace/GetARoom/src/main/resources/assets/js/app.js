@@ -98,13 +98,11 @@
 
             //If non logged in user tries to access restricted page, deny request
             $rootScope.$on('$locationChangeStart', function(event, next, current) {
-                var loginPage = ['/login'];
                 var publicPages = ['/login'];
                 var restrictedPage = publicPages.indexOf($location.path()) === -1;
                 if (restrictedPage && !$localStorage.currentUser) {
                     $location.path('/login');
-                }
-                if (loginPage && $localStorage.currentUser) {
+                } else if (!restrictedPage && $localStorage.currentUser) {
                     $location.path('/');
                 }
             });

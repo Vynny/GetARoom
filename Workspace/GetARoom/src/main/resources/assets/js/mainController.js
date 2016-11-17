@@ -13,6 +13,7 @@ angular.module('mainController', [])
 
 
     }).controller('LoginCtrl', function($scope, $state, $rootScope, $http, $localStorage) {
+        //Contoller for Login page
         $rootScope.showSidebar = true;
         $scope.statusMessage;
         $scope.apisrc = $state.current.data.apisrc;
@@ -37,7 +38,6 @@ angular.module('mainController', [])
                     }
                 });
         };
-        //Controller for all rooms page 
     }).controller('RoomsCtrl', function($scope, $state, $resource, Room) {
         //Controller for all rooms page 
     }).controller('RoomCtrl', function($scope, $state, $resource, id, RoomService) {
@@ -88,18 +88,10 @@ angular.module('mainController', [])
         $scope.hideReservationView = true;
 
         $scope.thisroom = RoomService.getCurrentRoom();
-
-        //console.log("Thisroom is: " + JSON.stringify($scope.thisroom));
-
         $scope.events = [];
         $scope.eventSources = [$scope.events];
 
         $scope.select = function(start, end, jsEvent, view) {
-            /*var eventData = {
-                start: start,
-                end: end
-            };  
-            $scope.events.push(eventData);*/
             $scope.startTime = start.format('lll');
             $scope.endTime = end.format('lll');
             $scope.hideReservationView = false;
