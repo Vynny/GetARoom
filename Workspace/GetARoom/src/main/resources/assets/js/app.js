@@ -56,8 +56,16 @@
                         }
                     },
                     data: {
-                        pageTitle: 'Reserve'
-                    }
+                       pageTitle: 'Reserve'
+                    },
+                    params: {
+                        date: null
+                    }/*,
+                    resolve: {
+                        date: function($stateParams) {
+                            return $stateParams.date;
+                        }
+                    }*/
                 }).state('userpanel', {
                     url: "/userpanel",
                     templateUrl: viewsPrefix + "userpanel.html",

@@ -23,11 +23,25 @@ angular.module('mainController', [])
 
         $scope.events = [{ title: 'All Day Event', start: new Date(date.getFullYear(), date.getMonth(), 12) }];
         $scope.eventSources = [$scope.events];
+        $scope.hideReservationButton = true;
+
+        $scope.reserveDay;
+        $scope.reserveDayObj;
+
+        $scope.dayClick = function(date, jsEvent, view) {
+            console.log("Click on: " + date.format('MMM Do'));
+            $scope.reserveDayObj = date;
+            $scope.reserveDay = date.format('MMM Do');
+            $scope.hideReservationButton = false;
+        };
+
 
         $scope.uiConfig = {
             calendar: {
                 height: 800,
-                editable: false,
+                editable: true,
+                selectable: true,
+                dayClick: $scope.dayClick,
                 header: {
                     left: 'month agendaWeek agendaDay',
                     center: 'title',
@@ -40,10 +54,9 @@ angular.module('mainController', [])
         };
 
 
-    }).controller('ReserveCtrl', function($scope, $state, $resource, RoomService) {
+    }).controller('ReserveCtrl', function($scope, $state, $resource, $stateParams, RoomService) {
         //Controller for single room page, reserve
-        var date = new Date();
-
+        console.log("Date is: " + $stateParams.date);
         $scope.startTime;
         $scope.endTime;
         $scope.hideReservationView = true;
@@ -68,6 +81,8 @@ angular.module('mainController', [])
 
         $scope.uiConfig = {
             calendar: {
+                defaultDate: $stateParams.date,
+                defaultView: 'agendaDay',
                 height: 500,
                 editable: true,
                 selectable: true,
@@ -75,9 +90,9 @@ angular.module('mainController', [])
                 unselectAuto: false, 
                 select: $scope.select,
                 header: {
-                    left: 'month agendaWeek agendaDay',
+                    left: 'none',
                     center: 'title',
-                    right: 'today prev,next'
+                    right: 'none'
                 }
                 /*  eventClick: $scope.alertEventOnClick,
                   eventDrop: $scope.alertOnDrop,
