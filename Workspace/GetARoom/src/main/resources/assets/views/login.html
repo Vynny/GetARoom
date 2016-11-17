@@ -9,16 +9,15 @@
 		</div>
 		<form>
 			<div class="container">
-				<label for="username">Username</label>
+				<label style="color:#800000" for="username">Username</label>
 				<br/>
-				<input type="text" name="dasUsername" id="username" ng-model="user.name" placeholder="Enter Username here" required>
+				<input type="text" name="username" id="username" ng-model="user.name" placeholder="Enter Username here" required>
 				<br/>
-				<label for="password">Password</label>
+				<label style="color:#800000" for="password">Password</label>
 				<br/>
-				<input type="password" name="dasPassword" id="password" ng-model="user.password" placeholder="Enter Password here" required>
+				<input type="password" name="password" id="password" ng-model="user.password" placeholder="Enter Password here" required>
 				<br/>
 				<button ng-click="loginButton()">Login</button>
-				<input type="checkbox" checked="checked">Remember me
 				<br/>
 			</div>
 		</form>

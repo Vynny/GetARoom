@@ -1,11 +1,8 @@
 body {
 	background: url("../images/photo_bg.jpg") no-repeat center center fixed;
 	background-size: cover;
-	font-size: 16px;
-	font-family: 'Lato', sans-serif;
-	font-weight: 300;
 	margin: 0;
-	color: #FF0000;
+	
 }
 
 h1#title {
@@ -20,6 +17,9 @@ h1#title {
 	text-align: center;
 	position: relative;
 	top: 0px;
+	font-size: 16px;
+	font-family: 'Lato', sans-serif;
+	font-weight: 300;
 }
 
 h1#title span span {
@@ -63,6 +63,9 @@ p.small {
 	background: -webkit-linear-gradient(top,  rgba(0,0,0,0.6) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
 	background: linear-gradient(to bottom,  rgba(0,0,0,0.6) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#99000000', endColorstr='#00000000',GradientType=0 ); /* IE6-9 */
+	font-size: 16px;
+	font-family: 'Lato', sans-serif;
+	font-weight: 300;
 }
 
 .login-box {
@@ -75,12 +78,21 @@ p.small {
 	border-radius: 5px;
 	box-shadow: 0 5px 50px rgba(0,0,0,0.4);
 	text-align: center;
+	font-size: 16px;
+	font-family: 'Lato', sans-serif;
+	font-weight: 300;
 }
 
 .login-box .box-header {
 	background-color: #665851;
 	margin-top: 0;
 	border-radius: 5px 5px 0 0;
+	color: #FF0000;
+	top:250px;
+	text-align: center;
+	font-size: 16px;
+	font-family: 'Lato', sans-serif;
+	font-weight: 300;
 }
 
 .login-box label {
@@ -90,6 +102,10 @@ p.small {
 	letter-spacing: 1px;
 	text-transform: uppercase;
 	line-height: 2em;
+	text-align: center;
+	font-size: 16px;
+	font-family: 'Lato', sans-serif;
+	font-weight: 300;
 }
 
 .login-box input {
