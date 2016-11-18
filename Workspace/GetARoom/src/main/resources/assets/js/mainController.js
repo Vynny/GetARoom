@@ -1,6 +1,7 @@
 angular.module('mainController', [])
     .controller('home', function($scope, $state, $resource, $rootScope, UserService, Room) {
         $scope.title = 'Project name';
+        $scope.username = UserService.getCurrentUser().username;
 
         // returns true if the current router url matches the passed in url
         // so views can set 'active' on links easily
@@ -13,14 +14,14 @@ angular.module('mainController', [])
 
         $scope.logout = function() {
             UserService.logoutUser();
-            $rootScope.hideSidebar = true;
+            $rootScope.hideBars = true;
             $state.go('login');
         };
 
 
     }).controller('LoginCtrl', function($scope, $rootScope, $state, UserService) {
         //Contoller for Login page
-        $rootScope.hideSidebar = true;
+        $rootScope.hideBars = true;
         $scope.statusMessage;
 
         $scope.loginButton = function() {

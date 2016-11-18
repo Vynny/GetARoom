@@ -29,7 +29,7 @@ angular.module('getaroom.services', ['app'])
                         //Set Authorization headers for user requests
                         $http.defaults.headers.common.Authorization = 'Bearer ' + response.token;
                         //Show sidebar and redirect to home view
-                        $rootScope.hideSidebar = false;
+                        $rootScope.hideBars = false;
                     }
                 });
         },
