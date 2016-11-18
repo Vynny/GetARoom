@@ -158,7 +158,7 @@ p.small {
 
 /* Animation Delay */
 #logo {
-	-webkit-animation-duration: 1s;
+	-webkit-animation-duration: 2s;
 	-webkit-animation-delay: 2s;
 }
 
