@@ -1,6 +1,6 @@
 (function() {
     var app = angular.module('app', ['ui.router', 'ngAnimate', 'ui.bootstrap', 'ngResource', 'ui.calendar', 'getaroom.services', 'mainController', 'ngStorage'])
-    var apisrc = "http://localhost:8080";
+    var apisrc = "http://getaroom.lvain.com";
 
     app.config(function($stateProvider, $urlRouterProvider, $controllerProvider) {
             var origController = app.controller
