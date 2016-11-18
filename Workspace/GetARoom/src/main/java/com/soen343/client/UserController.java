@@ -1,5 +1,8 @@
 package com.soen343.client;
 
+import static org.jose4j.jws.AlgorithmIdentifiers.HMAC_SHA256;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,9 +18,6 @@ import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.JoseException;
-
-import static org.jose4j.jws.AlgorithmIdentifiers.HMAC_SHA256;
-import static java.util.Collections.singletonMap;
 
 import com.codahale.metrics.annotation.Timed;
 import com.soen343.core.User;
@@ -72,7 +72,11 @@ public class UserController {
 	        jws.setKey(new HmacKey(tokenSecret));
 
 	        try {
-	            return singletonMap("token", jws.getCompactSerialization());
+	            //return singletonMap("token", jws.getCompactSerialization());
+	        	Map<String, String> response = new HashMap<String, String>();
+	        	response.put("userId", Long.toString(session.getId()));
+	        	response.put("token", jws.getCompactSerialization());
+	            return response;
 	        }
 	        catch (JoseException e) { throw Throwables.propagate(e); }
 		}

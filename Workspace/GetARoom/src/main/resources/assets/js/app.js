@@ -39,7 +39,8 @@
                         }
                     },
                     data: {
-                        pageTitle: 'Room'
+                        pageTitle: 'Room',
+                        apisrc: apisrc
                     },
                     resolve: {
                         id: function($stateParams) {
@@ -56,7 +57,8 @@
                         }
                     },
                     data: {
-                        pageTitle: 'Reserve'
+                        pageTitle: 'Reserve',
+                        apisrc: apisrc
                     },
                     params: {
                         date: null
@@ -106,6 +108,7 @@
                     $location.path('/');
                 }
             });
+            $rootScope.apisrc = apisrc;
         })
         .directive('updateTitle', ['$rootScope', '$timeout',
             function($rootScope, $timeout) {
@@ -124,7 +127,5 @@
             }
         ]).factory("Room", function($resource) {
             return $resource(apisrc + "/api/room/:id", { id: "@id" });
-        }).factory("User", function($resource) {
-            return $resource(apisrc + "/api/user/:id", { id: "@id" });
         });
 }());

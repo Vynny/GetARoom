@@ -59,7 +59,7 @@
 
 </head>
 
-<body>
+<body ng-controller="home">
 	<!-- NAVBAR -->
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container-fluid">
@@ -75,7 +75,7 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
             <li><a class="navbar-brand" href="#/userpanel" ui-sref="userpanel">Profile</a></li>
-            <li><a class="navbar-brand" href="#">Log Out</a></li>
+            <li><a ng-click="logout()" class="navbar-brand" href="#">Log Out</a></li>
           </ul>
         </div>
       </div>
@@ -83,11 +83,11 @@
   </nav>
 
   <!-- MAIN CONTAINER -->
-  <div class="container-fluid" ng-controller="home">
+  <div class="container-fluid" >
     <div class="row">
 
      <!-- SIDEBAR -->
-     <div class="col-sm-3 col-md-2 sidebar" ng-hide="showSidebar">
+     <div class="col-sm-3 col-md-2 sidebar" ng-hide="hideSidebar">
       <ul class="nav nav-sidebar">
         <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
         <li><a ui-sref="rooms">All Rooms</a></li>
