@@ -1,7 +1,15 @@
 angular.module('mainController', [])
     .controller('home', function($scope, $state, $resource, $rootScope, UserService, Room) {
         $scope.title = 'Project name';
-        $scope.username = UserService.getCurrentUser().username;
+        $scope.username;
+        console.log($scope.username);
+
+        $rootScope.$on('login-success', function() {
+            if (UserService.getCurrentUser()) {
+                $scope.username = UserService.getCurrentUser().username;
+                console.log($scope.username);
+            }
+        });
 
         // returns true if the current router url matches the passed in url
         // so views can set 'active' on links easily
@@ -28,7 +36,8 @@ angular.module('mainController', [])
             UserService.authenticateUser($scope.user.name, $scope.user.password).then(function(d) {
                 console.log(JSON.stringify(d));
                 if (d.data.token) {
-                    $state.go("home");
+                    $rootScope.$emit('login-success');
+                    $state.go("home", { reload: true });
                 } else {
                     $scope.statusMessage = "Login Failed!";
                 }
@@ -95,6 +104,7 @@ angular.module('mainController', [])
     }).controller('ReserveCtrl', function($scope, $state, $resource, $stateParams, RoomService, ReservationService, UserService) {
         //Controller for single room page, reserve
         $scope.reserveDayObj = $stateParams.date;
+        $scope.sessionActive = true;
 
         $scope.startTime;
         $scope.endTime;
@@ -107,6 +117,7 @@ angular.module('mainController', [])
         $scope.destroyReservationSession = function() {
             console.log("Destroying Session");
             ReservationService.destroyReservationSession(UserService.getCurrentUser(), $scope.thisroom, $scope.reserveDayObj);
+            $scope.sessionActive = false;
         };
 
         $scope.select = function(start, end, jsEvent, view) {
@@ -132,4 +143,15 @@ angular.module('mainController', [])
                 }
             }
         };
+        $scope.$on("$destroy", function() {
+            if ($scope.sessionActive)
+                ReservationService.destroyReservationSession(UserService.getCurrentUser(), $scope.thisroom, $scope.reserveDayObj);
+        });
+
+        /* $scope.$on('$stateChangeStart', function(event) {
+             var answer = confirm("Are you sure you want to leave this page?")
+             if (!answer) {
+                 event.preventDefault();
+             }
+         });*/
     });

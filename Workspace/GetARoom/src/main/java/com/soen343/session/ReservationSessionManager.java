@@ -17,7 +17,6 @@ public class ReservationSessionManager {
 
 	public ReservationSessionManager() {
 		sessionList = new ArrayList<ReservationSession>();
-		addSession(new ReservationSession(1, 1, new DateTime("2016-11-15T05:00:00.000Z")));
 	}
 	
 	public boolean doesSessionExist(ReservationSessionMessage request) {
@@ -67,8 +66,4 @@ public class ReservationSessionManager {
 		sessionList.add(session);
 	}
 
-	/*private void removeSession(ReservationSession session) {
-		sessionList.remove(session);
-	}
-*/
 }
