@@ -1,15 +1,21 @@
 package com.soen343.client;
 
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.joda.time.DateTime;
 
 import com.codahale.metrics.annotation.Timed;
 import com.soen343.core.QueueNode;
@@ -43,6 +49,29 @@ public class ReservationController {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
     }
+    
+    @GET
+    @Path("/create")
+    @Timed
+    public void createReservation(@QueryParam("userid") long userId, @QueryParam("userid") long roomId, @QueryParam("start") String start, @QueryParam("end") String end) {
+    	
+    	Reservation newReservation = new Reservation((long)1, userId, roomId, true, start, end);
+    	List<QueueNode> roots = getTrees();
+
+    	for (Reservation res : reservationMapper.getAll()) {
+    		if (res.isCollision(newReservation)) {
+    			QueueNode newNode = new QueueNode(newReservation);
+    	    	for (QueueNode root : roots) {
+    	    		QueueNode resNode = root.search(res, root);
+    	    		if (resNode != null) {
+    	    			newNode.addChild(root);   
+    	    			queueNodeEdgeMapper.create(new QueueNodeEdge((long)1, newReservation.getId(), root.getReservationId()));
+    	    			return;
+    	    		}
+    	    	}
+    		}
+    	}
+    }
 
     // Returns next reservation in queue
     @GET
@@ -51,15 +80,17 @@ public class ReservationController {
     public void cancelReservation(@PathParam("id") Integer id) {
     	Reservation reservation = reservationMapper.get(id);
     	if (reservation != null) {
-    		QueueNode root = getTree();
-    		if (root != null) {
-	    		QueueNode parent = root.removeNode(reservation);
-	    		
-	       		if ((parent != null) && !(parent.childrenEmpty())) {
-	    			reservationMapper.setWaitlisted(parent.getReservation(), false);
+    		List<QueueNode> roots = getTrees();
+    		for (QueueNode root : roots) {
+	    		if (root != null) {
+		    		QueueNode parent = root.removeNode(reservation);
+		    		
+		       		if ((parent != null) && !(parent.childrenEmpty())) {
+		    			reservationMapper.setWaitlisted(parent.getReservation(), false);
+		    		}
 	    		}
+	    		reservationMapper.delete(reservation);
     		}
-    		reservationMapper.delete(reservation);
         } else {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
@@ -97,10 +128,10 @@ public class ReservationController {
     }
     
     // Helper class to construct tree from edges
-	private QueueNode getTree() {
+	private List<QueueNode> getTrees() {
 		Hashtable<Integer, QueueNode> table = new Hashtable<Integer, QueueNode>();
-		int lastId = -1;
-		
+		LinkedList<QueueNode> roots = new LinkedList<QueueNode>();
+				
 		List<QueueNodeEdge> all = queueNodeEdgeMapper.getAll();
 		
 		for (QueueNodeEdge edge : all) {
@@ -115,14 +146,15 @@ public class ReservationController {
 			}
 			
 			table.get(pid).addChild(table.get(cid));
-			lastId = pid;
 		}
 		
-		if (all.isEmpty()) {
-			return null;
+		for (QueueNode node : table.values()) {
+			QueueNode currentRoot = node.getRoot();
+			if (!roots.contains(currentRoot)) {
+				roots.add(currentRoot);
+			}
 		}
-		else {
-			return table.get(lastId).getRoot();
-		}
+		
+		return roots;
 	}
 }
