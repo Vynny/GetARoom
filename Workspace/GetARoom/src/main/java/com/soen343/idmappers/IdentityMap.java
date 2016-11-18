@@ -7,7 +7,7 @@ import com.soen343.core.DomainObject;
 
 public class IdentityMap {
 
-	private Map<Long, DomainObject> identityMap;
+	protected Map<Long, DomainObject> identityMap;
 
 	public IdentityMap() {
 		this.identityMap = new HashMap<Long, DomainObject>();

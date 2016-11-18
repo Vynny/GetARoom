@@ -25,7 +25,13 @@ public interface ReservationTDG {
 	
 	@SqlQuery("select * from Reservation where id = :id")
 	Reservation findById(@Bind("id") int id);
+	
+	@SqlQuery("select * from Reservation where user_id = :id")
+	List<Reservation> findByUserId(@Bind("id") int id);
 
+	@SqlQuery("select * from Reservation where room_id = :id")
+	List<Reservation> findByRoomId(@Bind("id") int id);
+	
 	@SqlQuery("select * from Reservation")
 	List<Reservation> getAll();
 

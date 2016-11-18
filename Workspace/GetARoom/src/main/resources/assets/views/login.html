@@ -1,26 +1,29 @@
-<div class="container">
-	<div class="top">
-		<h1 id="title" class="hidden"><span id="logo">Welcome to <span>GetARoom!</span></span></h1>
-	</div>
-	<div class="login-box animated fadeInUp">
-		<div class="box-header">
-			<h2>Log In</h2>
-			<h3>{{statusMessage}}</h3>
+<div class="logineverything">
+	<div class="container">
+		<div class="top">
+		<h1 id="title" class="animated fadeInDown" style="font-family:Monotype Corsiva, Times, Serif;"><span id="logo">Welcome to <span>GetARoom!</span></span></h1>
 		</div>
-		<form>
-			<div class="container">
-				<label for="username">Username</label>
-				<br/>
-				<input type="text" name="dasUsername" id="username" ng-model="user.name" placeholder="Enter Username here" required>
-				<br/>
-				<label for="password">Password</label>
-				<br/>
-				<input type="password" name="dasPassword" id="password" ng-model="user.password" placeholder="Enter Password here" required>
-				<br/>
-				<button ng-click="loginButton()">Login</button>
-				<input type="checkbox" checked="checked">Remember me
-				<br/>
+		<div class="login-box animated fadeInUp">
+			<div class="box-header">
+				<h2>Log In</h2>
+				<h3>{{statusMessage}}</h3>
 			</div>
-		</form>
+			<form>
+					<div class="container">
+					<div class="logintext">
+						<label style="color:#800000" for="username">Username</label>
+						
+						<input type="text" name="username" id="username" ng-model="user.name" placeholder="Enter Username here" required>
+						<br/>
+						<label style="color:#800000" for="password">Password</label>
+						
+						<input type="password" name="password" id="password" ng-model="user.password" placeholder="Enter Password here" required>
+						<br/>
+						<button class="testLoginButton" ng-click="loginButton()">Login</button>
+						<br/>
+					</div>
+				</div>
+			</form>
+		</div>
 	</div>
 </div>
