@@ -16,6 +16,7 @@ import com.github.toastshaman.dropwizard.auth.jwt.JwtAuthFilter;
 import com.soen343.client.ReservationController;
 import com.soen343.client.RoomController;
 import com.soen343.client.UserController;
+import com.soen343.db.QueueNodeEdgeTDG;
 import com.soen343.db.ReservationTDG;
 import com.soen343.db.RoomTDG;
 import com.soen343.db.UserTDG;
@@ -61,10 +62,11 @@ public class GetARoomApplication extends Application<GetARoomConfiguration> {
 		final RoomTDG roomTDG = jdbi.onDemand(RoomTDG.class);
 		final ReservationTDG reservationTDG = jdbi.onDemand(ReservationTDG.class);
 		final UserTDG userTDG = jdbi.onDemand(UserTDG.class);
+		final QueueNodeEdgeTDG queueNodeEdgeTDG = jdbi.onDemand(QueueNodeEdgeTDG.class);
 		
 		//Controller Initialization
 		RoomController roomController = new RoomController(roomTDG);
-		ReservationController reservationController = new ReservationController(reservationTDG);
+		ReservationController reservationController = new ReservationController(reservationTDG, queueNodeEdgeTDG);
 		UserController userController = new UserController(userTDG, configuration.getJwtTokenSecret());
 				
 		//Controller Registration

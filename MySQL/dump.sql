@@ -16,6 +16,25 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `QueueNodeEdge`
+--
+
+DROP TABLE IF EXISTS `QueueNodeEdge`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `QueueNodeEdge` (
+  `id` int(11) NOT NULL,
+  `parent_id` int(11) NOT NULL,
+  `child_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `parent_id` (`parent_id`),
+  KEY `child_id` (`child_id`),
+  CONSTRAINT `QueueNodeEdge_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `Reservation` (`id`),
+  CONSTRAINT `QueueNodeEdge_ibfk_2` FOREIGN KEY (`child_id`) REFERENCES `Reservation` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `Reservation`
 --
 
@@ -76,4 +95,4 @@ CREATE TABLE `User` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-11-17 15:09:30
+-- Dump completed on 2016-11-17 19:17:35

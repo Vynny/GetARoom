@@ -1,13 +1,18 @@
 package com.soen343.mappers;
 
+import java.util.Hashtable;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.soen343.core.DomainObject;
+import com.soen343.core.QueueNode;
+import com.soen343.core.QueueNodeEdge;
 import com.soen343.core.Reservation;
+import com.soen343.db.QueueNodeEdgeTDG;
 import com.soen343.db.ReservationTDG;
+import com.soen343.idmappers.QueueNodeEdgeIdentityMap;
 import com.soen343.idmappers.ReservationIdentityMap;
 import com.soen343.uow.UnitOfWork;
 
@@ -31,11 +36,18 @@ public class ReservationMapper implements Mapper<Reservation> {
 		uow.registerNew((DomainObject) reservation);
 		uow.commit();
 	}
-
+	
+	public void setWaitlisted(Reservation reservation, boolean waitlisted) {
+		UnitOfWork uow = new UnitOfWork(this);
+		uow.registerDirty((DomainObject) reservation);
+		reservation.setWaitlisted(waitlisted);
+		uow.commit();
+	}
+		
 	public List<Reservation> getAll() {
 		return reservationTDG.getAll();
 	}
-
+	
 	public Reservation get(int id) {
 		Reservation reservation = (Reservation) reservationIdentityMapper.get(id);
 		if (reservation == null) {
@@ -60,10 +72,6 @@ public class ReservationMapper implements Mapper<Reservation> {
 		return reservations;
 	}
 	
-	public Reservation set(int id, String description) {
-		return null;
-	}
-
 	@Override
 	public void save(Reservation o) {
 		reservationTDG.update(o);

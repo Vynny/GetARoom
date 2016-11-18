@@ -51,4 +51,13 @@ public class Reservation implements DomainObject {
 	public DateTime getEnd_time() {
 		return end_time;
 	}
+	
+	public void setWaitlisted(boolean waitlisted) {
+		this.waitlisted = waitlisted;
+	}
+	
+	public boolean isCollision(Reservation comp) {
+		return ((comp.getStart_time().isAfter(this.start_time) && comp.getStart_time().isBefore(this.end_time)) ||
+				(comp.getEnd_time().isAfter(this.start_time) && comp.getEnd_time().isBefore(this.end_time)));
+	}
 }
