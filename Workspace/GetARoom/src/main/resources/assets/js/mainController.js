@@ -1,6 +1,6 @@
 angular.module('mainController', [])
-    .controller('home', function($scope, $state, $resource, $rootScope, UserService, Room) {
-        $scope.title = 'Project name';
+    .controller('home', function($scope, $state, $resource, $rootScope, UserService, RoomService) {
+        $scope.title = 'GetARoom';
         $scope.username;
         console.log($scope.username);
 
@@ -21,7 +21,7 @@ angular.module('mainController', [])
             return ('#' + $state.$current.url.source + '/').indexOf(url + '/') === 0;
         };
 
-        $scope.rooms = Room.query();
+        $scope.rooms = RoomService.getAllRooms();
 
         $scope.logout = function() {
             UserService.logoutUser();
@@ -46,6 +46,21 @@ angular.module('mainController', [])
                 }
             });
         };
+    }).controller('UserPanelCtrl', function($scope, $state, $resource, UserService, ReservationService, RoomService) {
+        $scope.userReservations = [];
+
+        ReservationService.getByUser(UserService.getCurrentUser().userId).then(function(response) {
+            response.data.forEach(function(reservation) {
+                $scope.userReservations.push({
+                    id: reservation.id,
+                    roomId: reservation.roomId,
+                    roomDescription: RoomService.getRoomDescription(reservation.roomId),
+                    day: moment(reservation.start_time).format('MMM Do'),
+                    startTime: moment(reservation.start_time).format('h:mm a'),
+                    endTime: moment(reservation.end_time).format('h:mm a')
+                });
+            })
+        });
     }).controller('RoomsCtrl', function($scope, $state, $resource, Room) {
         //Controller for all rooms page 
     }).controller('RoomCtrl', function($scope, $state, $resource, id, RoomService, ReservationService, UserService) {
@@ -56,7 +71,7 @@ angular.module('mainController', [])
 
         $scope.events = [];
         $scope.eventSources = [$scope.events];
-        
+
         $scope.buttonText;
         $scope.buttonValid = true;
 
@@ -115,6 +130,8 @@ angular.module('mainController', [])
                 editable: false,
                 selectable: true,
                 allDaySlot: false,
+                minTime: RoomService.getMinTime(),
+                maxTime: RoomService.getMaxTime(),
                 dayClick: $scope.dayClick,
                 header: {
                     left: 'month agendaWeek agendaDay',
@@ -144,7 +161,6 @@ angular.module('mainController', [])
         $scope.events = $stateParams.events;
         $scope.eventSources = [$scope.events];
 
-        $scope.events.
 
         $scope.destroyReservationSession = function() {
             console.log("Destroying Session");
@@ -178,7 +194,7 @@ angular.module('mainController', [])
             } else {
                 $scope.buttonText = "Reservation Made!";
             }
-            
+
             $scope.counterTimeout = $timeout($scope.countdown, 1000)
         }
 
@@ -187,11 +203,14 @@ angular.module('mainController', [])
                 defaultDate: $stateParams.date,
                 defaultView: 'agendaDay',
                 height: 500,
-                editable: true,
+                editable: false,
                 selectable: true,
                 selectHelper: true,
+                selectOverlap: true,
                 unselectAuto: false,
                 allDaySlot: false,
+                minTime: RoomService.getMinTime(),
+                maxTime: RoomService.getMaxTime(),
                 select: $scope.select,
                 header: {
                     left: 'none',

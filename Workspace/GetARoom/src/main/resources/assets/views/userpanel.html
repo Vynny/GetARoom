@@ -35,18 +35,18 @@
         </thread>
         <tbody>
           <!--Testing repeating factor through table waiting for push of reservation ID and user ID-->
-          <tr ng-repeat = "rooms in rooms">
+          <tr ng-repeat = "reservation in userReservations">
+            <td>{{reservation.id}}</td>
+            <td><a ui-sref="rooms.room({ id: reservation.roomId })"> {{reservation.roomDescription}}</a></td>
             <td></td>
-            <td><a ui-sref="rooms.detail({ id: rooms.id })"> {{ rooms.description }}</a></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><button type="button" class="btn btn-sm btn-danger">Modify</button></td>
+            <td>{{reservation.day}}</td>
+            <td>{{reservation.startTime}}</td>
+            <td>{{reservation.endTime}}</td>
+            <td><button type="button" class="btn btn-block btn-danger">Modify</button></td>
             <td>
 
               <div class="dropdown">
-              <button class="btn btn-sm btn-danger dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">Delete
+              <button class="btn btn-block btn-danger dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">Delete
                   <span class="caret"></span></button>
                   <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
                     <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Confirm</a></li>

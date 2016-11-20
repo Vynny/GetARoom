@@ -1,16 +1,40 @@
 angular.module('getaroom.services', ['app'])
 
-.factory('RoomService', ['Room', function(Room) {
-    console.log("test");
+.factory('RoomService', ['Room', '$localStorage', function(Room, $localStorage) {
     var currentRoom;
-    return {
 
+    var allRooms = $localStorage.rooms;
+
+    var minTime = moment.duration('07:00:00');
+    var maxTime = moment.duration('22:00:00');
+
+    return {
+        getAllRooms: function() {
+            $localStorage.rooms = Room.query();
+            allRooms = $localStorage.rooms;
+            return allRooms;
+        },
         getRoom: function(id) {
             currentRoom = Room.get({ id: id });
             return currentRoom;
         },
         getCurrentRoom: function() {
             return currentRoom;
+        },
+        getRoomDescription: function(roomId) {
+            var res;
+            $localStorage.rooms.forEach(function(room) {
+                if (room.id == roomId) {
+                    res = room.description;
+                }
+            })
+            return res;
+        },
+        getMinTime: function() {
+            return minTime;
+        },
+        getMaxTime: function() {
+            return maxTime;
         }
     };
 }]).factory('UserService', ['$rootScope', '$localStorage', '$http', function($rootScope, $localStorage, $http) {
@@ -34,8 +58,8 @@ angular.module('getaroom.services', ['app'])
                 });
         },
         logoutUser: function() {
-        	delete $localStorage.currentUser;
-        	delete currentUser;
+            delete $localStorage.currentUser;
+            delete currentUser;
         },
         getCurrentUser: function() {
             return currentUser;
@@ -45,26 +69,29 @@ angular.module('getaroom.services', ['app'])
         }
     };
 }]).factory('ReservationService', ['$rootScope', '$localStorage', '$http', function($rootScope, $localStorage, $http) {
-   // var currentUser = $localStorage.currentUser;
+    // var currentUser = $localStorage.currentUser;
     //console.log(currentUser);
 
     return {
         verifyReservationSession: function(currentUser, currentRoom, day) {
-        	return $http.post($rootScope.apisrc + '/api/room/verifyReservationSession', { userId: currentUser.userId , roomId: currentRoom.id, day: day.format('YYYY-MM-DD') });
+            return $http.post($rootScope.apisrc + '/api/room/verifyReservationSession', { userId: currentUser.userId, roomId: currentRoom.id, day: day.format('YYYY-MM-DD') });
         },
         initiateReservationSession: function(currentUser, currentRoom, day) {
-        	return $http.post($rootScope.apisrc + '/api/room/initateReservationSession', { userId: currentUser.userId , roomId: currentRoom.id, day: day.format('YYYY-MM-DD') });
+            return $http.post($rootScope.apisrc + '/api/room/initateReservationSession', { userId: currentUser.userId, roomId: currentRoom.id, day: day.format('YYYY-MM-DD') });
         },
         destroyReservationSession: function(currentUser, currentRoom, day) {
-        	return $http.post($rootScope.apisrc + '/api/room/destroyReservationSession', { userId: currentUser.userId , roomId: currentRoom.id, day: day.format('YYYY-MM-DD') });
+            return $http.post($rootScope.apisrc + '/api/room/destroyReservationSession', { userId: currentUser.userId, roomId: currentRoom.id, day: day.format('YYYY-MM-DD') });
         },
         createReservation: function(user, room, startTime, endTime) {
-            var obj = { userId: user.userId , roomId: room.id, startTime: startTime, endTime: endTime};
+            var obj = { userId: user.userId, roomId: room.id, startTime: startTime, endTime: endTime };
             console.log(JSON.stringify(obj));
-            return $http.post($rootScope.apisrc + '/api/reservation', { userId: user.userId , roomId: room.id, startTime: startTime, endTime: endTime});
+            return $http.post($rootScope.apisrc + '/api/reservation', { userId: user.userId, roomId: room.id, startTime: startTime, endTime: endTime });
         },
         getByRoom: function(roomId) {
-             return $http.get($rootScope.apisrc + '/api/reservation/getbyroom/' + roomId);
+            return $http.get($rootScope.apisrc + '/api/reservation/getbyroom/' + roomId);
+        },
+        getByUser: function(userId) {
+            return $http.get($rootScope.apisrc + '/api/reservation/getbyuser/' + userId);
         }
     };
 }]);

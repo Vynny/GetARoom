@@ -1,9 +1,8 @@
 package com.soen343.mappers;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +49,7 @@ public class ReservationMapper implements Mapper<Reservation> {
 		Reservation reservation = (Reservation) reservationIdentityMapper.get(id);
 		if (reservation == null) {
 			reservation = reservationTDG.findById(id);
+			reservationIdentityMapper.add(reservation);
 		}
 		return reservation;
 	}
@@ -58,6 +58,9 @@ public class ReservationMapper implements Mapper<Reservation> {
 		List<Reservation> reservations = reservationIdentityMapper.getByRoomId(id);
 		if (reservations.isEmpty()) {
 			reservations = reservationTDG.findByRoomId(id);
+			
+			List<DomainObject> reservationDO = new ArrayList<DomainObject>(reservations);
+			reservationIdentityMapper.addAll(reservationDO);
 		}
 		return reservations;
 	}
@@ -66,6 +69,9 @@ public class ReservationMapper implements Mapper<Reservation> {
 		List<Reservation> reservations = reservationIdentityMapper.getByUserId(id);
 		if (reservations.isEmpty()) {
 			reservations = reservationTDG.findByUserId(id);
+			
+			List<DomainObject> reservationDO = new ArrayList<DomainObject>(reservations);
+			reservationIdentityMapper.addAll(reservationDO);
 		}
 		return reservations;
 	}
