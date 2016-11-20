@@ -35,10 +35,10 @@ public class RoomController {
 	private RoomMapper roomMapper;
 	private RoomTDG roomTDG;
 
-	public RoomController(RoomTDG roomTDG) {
+	public RoomController(RoomTDG roomTDG, ReservationSessionManager reservationSessionManager) {
 		this.roomTDG = roomTDG;
 		this.roomMapper = new RoomMapper(roomTDG);
-		this.reservationSessionManager = new ReservationSessionManager();
+		this.reservationSessionManager = reservationSessionManager;
 	}
 
 	@GET

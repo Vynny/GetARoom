@@ -1,6 +1,6 @@
 (function() {
     var app = angular.module('app', ['ui.router', 'ngAnimate', 'ui.bootstrap', 'ngResource', 'ui.calendar', 'getaroom.services', 'mainController', 'ngStorage'])
-    var apisrc = "http://getaroom.lvain.com";
+    var apisrc = "http://localhost:8080";
 
     app.config(function($stateProvider, $urlRouterProvider, $controllerProvider) {
             var origController = app.controller
@@ -61,7 +61,8 @@
                         apisrc: apisrc
                     },
                     params: {
-                        date: null
+                        date: null,
+                        events: null;
                     }
                 }).state('userpanel', {
                     url: "/userpanel",

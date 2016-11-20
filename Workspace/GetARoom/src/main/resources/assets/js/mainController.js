@@ -4,11 +4,14 @@ angular.module('mainController', [])
         $scope.username;
         console.log($scope.username);
 
+        if (UserService.getCurrentUser()) {
+            $scope.username = UserService.getCurrentUser().username;
+            console.log($scope.username);
+        }
+
         $rootScope.$on('login-success', function() {
-            if (UserService.getCurrentUser()) {
-                $scope.username = UserService.getCurrentUser().username;
-                console.log($scope.username);
-            }
+            $scope.username = UserService.getCurrentUser().username;
+            console.log($scope.username);
         });
 
         // returns true if the current router url matches the passed in url
@@ -49,16 +52,36 @@ angular.module('mainController', [])
         //Controller for single room page, view
         $scope.id = id;
         $scope.thisroom = RoomService.getRoom(id);
-        /* var date = new Date();
-         $scope.events = [{ title: 'All Day Event', start: new Date(date.getFullYear(), date.getMonth(), 12) }];
-         $scope.eventSources = [$scope.events];*/
         $scope.hideReservationButton = true;
 
+        $scope.events = [];
+        $scope.eventSources = [$scope.events];
+        
         $scope.buttonText;
         $scope.buttonValid = true;
 
         $scope.reserveDay;
         $scope.reserveDayObj;
+
+        ReservationService.getByRoom(id).then(function(response) {
+            console.log(response);
+            if (response.status !== 204) {
+                response.data.forEach(function(reservation) {
+                    console.log("Got: " + JSON.stringify(reservation));
+                    var username;
+
+                    UserService.getUsername(reservation.userId).then(function(r) {
+                        username = r.data.username;
+                        console.log("username is " + username);
+                        $scope.events.push({
+                            title: username,
+                            start: reservation.start_time,
+                            end: reservation.end_time
+                        })
+                    });
+                });
+            }
+        });
 
         $scope.dayClick = function(date, jsEvent, view) {
             $scope.reserveDayObj = date;
@@ -81,7 +104,7 @@ angular.module('mainController', [])
             if ($scope.buttonValid) {
                 ReservationService.initiateReservationSession(UserService.getCurrentUser(), $scope.thisroom, $scope.reserveDayObj).then(function(response) {
                     console.log(JSON.stringify(response));
-                    $state.go('rooms.room.reserve', { date: $scope.reserveDayObj });
+                    $state.go('rooms.room.reserve', { date: $scope.reserveDayObj, events: $scope.events });
                 });
             }
         };
@@ -89,8 +112,9 @@ angular.module('mainController', [])
         $scope.uiConfig = {
             calendar: {
                 height: 800,
-                editable: true,
+                editable: false,
                 selectable: true,
+                allDaySlot: false,
                 dayClick: $scope.dayClick,
                 header: {
                     left: 'month agendaWeek agendaDay',
@@ -101,18 +125,26 @@ angular.module('mainController', [])
         };
 
 
-    }).controller('ReserveCtrl', function($scope, $state, $resource, $stateParams, RoomService, ReservationService, UserService) {
+    }).controller('ReserveCtrl', function($scope, $state, $resource, $stateParams, $timeout, RoomService, ReservationService, UserService) {
         //Controller for single room page, reserve
+        $scope.buttonText = "Reserve";
+        $scope.counter = 4;
+        $scope.counterTimeout;
+
         $scope.reserveDayObj = $stateParams.date;
         $scope.sessionActive = true;
 
         $scope.startTime;
         $scope.endTime;
+        $scope.startTimeObj;
+        $scope.endTimeObj;
         $scope.hideReservationView = true;
 
         $scope.thisroom = RoomService.getCurrentRoom();
-        $scope.events = [];
+        $scope.events = $stateParams.events;
         $scope.eventSources = [$scope.events];
+
+        $scope.events.
 
         $scope.destroyReservationSession = function() {
             console.log("Destroying Session");
@@ -123,8 +155,32 @@ angular.module('mainController', [])
         $scope.select = function(start, end, jsEvent, view) {
             $scope.startTime = start.format('lll');
             $scope.endTime = end.format('lll');
+            $scope.startTimeObj = start;
+            $scope.endTimeObj = end;
             $scope.hideReservationView = false;
         };
+
+        $scope.confirmReservation = function() {
+            ReservationService.createReservation(UserService.getCurrentUser(), $scope.thisroom, $scope.startTimeObj.format(), $scope.endTimeObj.format()).then(function(response) {
+                console.log(JSON.stringify(response));
+            });
+            $scope.counterTimeout = $timeout($scope.countdown, 0);
+            $timeout(function() {
+                $state.go('rooms.room');
+                $scope.destroyReservationSession();
+            }, 4000)
+        }
+
+        $scope.countdown = function() {
+            if ($scope.counter > 1) {
+                $scope.counter--;
+                $scope.buttonText = $scope.counter;
+            } else {
+                $scope.buttonText = "Reservation Made!";
+            }
+            
+            $scope.counterTimeout = $timeout($scope.countdown, 1000)
+        }
 
         $scope.uiConfig = {
             calendar: {
@@ -135,6 +191,7 @@ angular.module('mainController', [])
                 selectable: true,
                 selectHelper: true,
                 unselectAuto: false,
+                allDaySlot: false,
                 select: $scope.select,
                 header: {
                     left: 'none',
@@ -147,11 +204,4 @@ angular.module('mainController', [])
             if ($scope.sessionActive)
                 ReservationService.destroyReservationSession(UserService.getCurrentUser(), $scope.thisroom, $scope.reserveDayObj);
         });
-
-        /* $scope.$on('$stateChangeStart', function(event) {
-             var answer = confirm("Are you sure you want to leave this page?")
-             if (!answer) {
-                 event.preventDefault();
-             }
-         });*/
     });

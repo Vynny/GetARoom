@@ -1,18 +1,15 @@
 package com.soen343.mappers;
 
-import java.util.Hashtable;
 import java.util.List;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.soen343.core.DomainObject;
-import com.soen343.core.QueueNode;
-import com.soen343.core.QueueNodeEdge;
 import com.soen343.core.Reservation;
-import com.soen343.db.QueueNodeEdgeTDG;
 import com.soen343.db.ReservationTDG;
-import com.soen343.idmappers.QueueNodeEdgeIdentityMap;
 import com.soen343.idmappers.ReservationIdentityMap;
 import com.soen343.uow.UnitOfWork;
 
@@ -29,6 +26,7 @@ public class ReservationMapper implements Mapper<Reservation> {
 	}
 	
 	public void makeNew(long user_id, long room_id, boolean waitlisted, String start_time, String end_time) {
+		logger.info("\t Start Time TS: " + start_time.toString());
 		UnitOfWork uow = new UnitOfWork(this);
 		long newID = reservationTDG.getMaxID() + 1;
 		Reservation reservation = new Reservation(newID, user_id, room_id, waitlisted, start_time, end_time);

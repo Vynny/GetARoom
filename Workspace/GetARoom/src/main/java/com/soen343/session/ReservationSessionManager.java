@@ -4,19 +4,33 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.soen343.client.ReservationController;
+import com.soen343.client.ReservationMessage;
 import com.soen343.client.RoomController;
 
 public class ReservationSessionManager {
 
 	final Logger logger = LoggerFactory.getLogger(ReservationSessionManager.class);
 	private List<ReservationSession> sessionList;
+	public static ReservationController reservationController;
+	public static RoomController roomController;
 
 	public ReservationSessionManager() {
 		sessionList = new ArrayList<ReservationSession>();
+	}
+	
+	public ReservationSession getSessionByUserId(long userId) {
+		Iterator<ReservationSession> it = sessionList.iterator();
+		while (it.hasNext()) {
+			ReservationSession session = it.next();
+			if (session.getUserId() == userId) {
+				return session;
+			}
+		}
+		return null;
 	}
 	
 	public boolean doesSessionExist(ReservationSessionMessage request) {
@@ -64,6 +78,14 @@ public class ReservationSessionManager {
 
 	private void addSession(ReservationSession session) {
 		sessionList.add(session);
+	}
+
+	public void setReservationController(ReservationController reservationController) {
+		ReservationSessionManager.reservationController = reservationController;
+	}
+
+	public void setRoomController(RoomController roomController) {
+		ReservationSessionManager.roomController = roomController;
 	}
 
 }

@@ -20,6 +20,7 @@ import com.soen343.db.QueueNodeEdgeTDG;
 import com.soen343.db.ReservationTDG;
 import com.soen343.db.RoomTDG;
 import com.soen343.db.UserTDG;
+import com.soen343.session.ReservationSessionManager;
 import com.soen343.auth.GetARoomAuthenticator;
 import com.soen343.core.User;
 
@@ -65,9 +66,14 @@ public class GetARoomApplication extends Application<GetARoomConfiguration> {
 		final QueueNodeEdgeTDG queueNodeEdgeTDG = jdbi.onDemand(QueueNodeEdgeTDG.class);
 		
 		//Controller Initialization
-		RoomController roomController = new RoomController(roomTDG);
-		ReservationController reservationController = new ReservationController(reservationTDG, queueNodeEdgeTDG);
+		ReservationSessionManager reservationSessionManager = new ReservationSessionManager();
+		
+		RoomController roomController = new RoomController(roomTDG, reservationSessionManager);
+		ReservationController reservationController = new ReservationController(reservationTDG, queueNodeEdgeTDG, reservationSessionManager);
 		UserController userController = new UserController(userTDG, configuration.getJwtTokenSecret());
+		
+		reservationSessionManager.setReservationController(reservationController);
+		reservationSessionManager.setRoomController(roomController);
 				
 		//Controller Registration
 		environment.jersey().register(reservationController);

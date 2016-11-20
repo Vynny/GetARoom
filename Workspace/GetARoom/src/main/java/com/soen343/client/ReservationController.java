@@ -1,21 +1,21 @@
 package com.soen343.client;
 
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.annotation.Timed;
 import com.soen343.core.QueueNode;
@@ -23,19 +23,26 @@ import com.soen343.core.QueueNodeEdge;
 import com.soen343.core.Reservation;
 import com.soen343.db.QueueNodeEdgeTDG;
 import com.soen343.db.ReservationTDG;
-import com.soen343.mappers.ReservationMapper;
 import com.soen343.mappers.QueueNodeEdgeMapper;
+import com.soen343.mappers.ReservationMapper;
+import com.soen343.session.ReservationSession;
+import com.soen343.session.ReservationSessionManager;
 
 @Path("/reservation")
 @Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class ReservationController {
 	
+	final Logger logger = LoggerFactory.getLogger(ReservationController.class);
+	
+	private ReservationSessionManager reservationSessionManager;
 	private ReservationMapper reservationMapper;
 	private QueueNodeEdgeMapper queueNodeEdgeMapper;
 
-    public ReservationController(ReservationTDG reservationTDG, QueueNodeEdgeTDG queueNodeEdgeTDG) {
+    public ReservationController(ReservationTDG reservationTDG, QueueNodeEdgeTDG queueNodeEdgeTDG, ReservationSessionManager reservationSessionManager) {
     	reservationMapper = new ReservationMapper(reservationTDG);
     	queueNodeEdgeMapper = new QueueNodeEdgeMapper(queueNodeEdgeTDG);
+    	this.reservationSessionManager = reservationSessionManager;
     }
 
     @GET
@@ -46,16 +53,17 @@ public class ReservationController {
     	if (reservation != null) {
             return reservation;
         } else {
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
+            throw new WebApplicationException(Response.Status.NO_CONTENT);
         }
     }
     
-    @GET
-    @Path("/create")
+    @POST
     @Timed
-    public void createReservation(@QueryParam("userid") long userId, @QueryParam("userid") long roomId, @QueryParam("start") String start, @QueryParam("end") String end) {
-    	
-    	Reservation newReservation = new Reservation((long)1, userId, roomId, true, start, end);
+    public ReservationMessage createReservation(ReservationMessage message) {
+    	logger.info("Got message: \n\t" + message);
+    	ReservationSession session = reservationSessionManager.getSessionByUserId(message.getUserId());
+    	session.makeReservation(message, false);
+    	/*Reservation newReservation = new Reservation((long)1, userId, roomId, true, start, end);
     	List<QueueNode> roots = getTrees();
 
     	for (Reservation res : reservationMapper.getAll()) {
@@ -70,7 +78,8 @@ public class ReservationController {
     	    		}
     	    	}
     		}
-    	}
+    	}*/
+    	return message;
     }
 
     // Returns next reservation in queue
@@ -92,7 +101,7 @@ public class ReservationController {
 	    		reservationMapper.delete(reservation);
     		}
         } else {
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
+            throw new WebApplicationException(Response.Status.NO_CONTENT);
         }
     }
     		
@@ -104,7 +113,7 @@ public class ReservationController {
     	if (!reservations.isEmpty()) {
             return reservations;
         } else {
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
+            throw new WebApplicationException(Response.Status.NO_CONTENT);
         }
     }
 
@@ -116,15 +125,8 @@ public class ReservationController {
     	if (!reservations.isEmpty()) {
             return reservations;
         } else {
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
+            throw new WebApplicationException(Response.Status.NO_CONTENT);
         }
-    }
-    
-    @GET
-    @Path("/createtest")
-    @Timed
-    public void test() {
-    	reservationMapper.makeNew(1, 1, false, "2016-11-14T08:00", "2016-11-14T10:00");
     }
     
     // Helper class to construct tree from edges
@@ -156,5 +158,9 @@ public class ReservationController {
 		}
 		
 		return roots;
+	}
+	
+	public ReservationMapper getReservationMapper() {
+		return this.reservationMapper;
 	}
 }

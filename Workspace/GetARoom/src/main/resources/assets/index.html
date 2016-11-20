@@ -92,10 +92,10 @@
        <!-- SIDEBAR -->
 
        <div class="col-sm-3 col-md-2 sidebar" ng-hide="hideBars">
-        <ul class="nav nav-sidebar">
-          <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
-          <li><a ui-sref="rooms">All Rooms</a></li>
-        </ul>
+       <!--  <ul class="nav nav-sidebar">
+         <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
+         <li><a ui-sref="rooms">All Rooms</a></li>
+       </ul> -->
         <ul class="nav nav-sidebar">
          <li ng-repeat="room in rooms"><a ui-sref="rooms.room({id: room.id})">{{room.description}}</a></li>
        </ul>

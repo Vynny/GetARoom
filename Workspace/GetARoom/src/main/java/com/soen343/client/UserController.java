@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
@@ -47,6 +48,20 @@ public class UserController {
     	List<User> users = userMapper.getAll();
     	if (users != null) {
             return users;
+        } else {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+    }
+    
+    @GET
+    @Path("/{id}")
+    @Timed
+    public Map<String, String> getUser(@PathParam("id") Integer id) {
+    	User user = userMapper.get(id);
+    	if (user != null) {
+    		HashMap<String,String> response = new HashMap<String,String>();
+    		response.put("username", user.getName());
+            return response;
         } else {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }

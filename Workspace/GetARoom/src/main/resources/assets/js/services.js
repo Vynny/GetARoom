@@ -39,6 +39,9 @@ angular.module('getaroom.services', ['app'])
         },
         getCurrentUser: function() {
             return currentUser;
+        },
+        getUsername: function(userId) {
+            return $http.get($rootScope.apisrc + '/api/user/' + userId);
         }
     };
 }]).factory('ReservationService', ['$rootScope', '$localStorage', '$http', function($rootScope, $localStorage, $http) {
@@ -55,8 +58,13 @@ angular.module('getaroom.services', ['app'])
         destroyReservationSession: function(currentUser, currentRoom, day) {
         	return $http.post($rootScope.apisrc + '/api/room/destroyReservationSession', { userId: currentUser.userId , roomId: currentRoom.id, day: day.format('YYYY-MM-DD') });
         },
-        getCurrentUser: function() {
-            return currentUser;
+        createReservation: function(user, room, startTime, endTime) {
+            var obj = { userId: user.userId , roomId: room.id, startTime: startTime, endTime: endTime};
+            console.log(JSON.stringify(obj));
+            return $http.post($rootScope.apisrc + '/api/reservation', { userId: user.userId , roomId: room.id, startTime: startTime, endTime: endTime});
+        },
+        getByRoom: function(roomId) {
+             return $http.get($rootScope.apisrc + '/api/reservation/getbyroom/' + roomId);
         }
     };
 }]);
