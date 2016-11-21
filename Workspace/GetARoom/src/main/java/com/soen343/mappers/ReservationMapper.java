@@ -39,7 +39,7 @@ public class ReservationMapper implements Mapper<Reservation> {
 	
 	public void remove(long id) {
 		UnitOfWork uow = new UnitOfWork(this);
-		Reservation res = reservationTDG.findById((int)id);
+		Reservation res = reservationTDG.findById(id);
 		reservationIdentityMapper.delete(id);
 		uow.registerDeleted(res);
 		uow.commit();
@@ -56,7 +56,7 @@ public class ReservationMapper implements Mapper<Reservation> {
 		return reservationTDG.getAll();
 	}
 	
-	public Reservation get(int id) {
+	public Reservation get(long id) {
 		Reservation reservation = (Reservation) reservationIdentityMapper.get(id);
 		if (reservation == null) {
 			reservation = reservationTDG.findById(id);
@@ -67,7 +67,7 @@ public class ReservationMapper implements Mapper<Reservation> {
 		return reservation;
 	}
 	
-	public List<Reservation> getByRoom(int id) {
+	public List<Reservation> getByRoom(long id) {
 		List<Reservation> reservations = reservationIdentityMapper.getByRoomId(id);
 		if (reservations.isEmpty()) {
 			reservations = reservationTDG.findByRoomId(id);
@@ -78,7 +78,7 @@ public class ReservationMapper implements Mapper<Reservation> {
 		return reservations;
 	}
 
-	public List<Reservation> getByUser(int id) {
+	public List<Reservation> getByUser(long id) {
 		List<Reservation> reservations = reservationIdentityMapper.getByUserId(id);
 		if (reservations.isEmpty()) {
 			reservations = reservationTDG.findByUserId(id);

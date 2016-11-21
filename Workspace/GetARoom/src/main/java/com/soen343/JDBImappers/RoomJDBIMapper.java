@@ -12,7 +12,7 @@ public class RoomJDBIMapper implements ResultSetMapper<Room> {
 
 	@Override
 	public Room map(int index, ResultSet r, StatementContext ctx) throws SQLException {
-		 return new Room(r.getInt("id"), r.getString("description"));
+		 return new Room(r.getLong("id"), r.getString("description"));
 	}
 
 }

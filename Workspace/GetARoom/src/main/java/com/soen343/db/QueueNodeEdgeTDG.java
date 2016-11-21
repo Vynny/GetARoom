@@ -23,7 +23,7 @@ public interface QueueNodeEdgeTDG {
 	void delete(@BindBean QueueNodeEdge edge);
 	
 	@SqlQuery("select * from QueueNodeEdge where id = :id")
-	QueueNodeEdge findById(@Bind("id") int id);
+	QueueNodeEdge findById(@Bind("id") long id);
 	
 	@SqlQuery("select * from QueueNodeEdge where parent_id = :parentId and child_id = :childId")
 	QueueNodeEdge findByParentChildId(@Bind("parentId") long parentId, @Bind("childId") long childId);

@@ -20,7 +20,7 @@ public class UserMapper implements Mapper<User> {
 		return userTDG.getAll();
 	}
 
-	public User get(int id) {
+	public User get(long id) {
 		User user = (User) userIdentityMapper.get(id);
 		if (user == null) {
 			user = userTDG.findById(id);
@@ -33,7 +33,7 @@ public class UserMapper implements Mapper<User> {
 		return user;
 	}
 
-	public User set(int id, String description) {
+	public User set(long id, String description) {
 		return null;
 	}
 

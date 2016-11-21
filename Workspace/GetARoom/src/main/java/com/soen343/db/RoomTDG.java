@@ -21,11 +21,11 @@ public interface RoomTDG {
 	void update(@BindBean("r") Room room);
 
 	@SqlQuery("select * from Room where id = :id")
-	Room findById(@Bind("id") int id);
+	Room findById(@Bind("id") long id);
 
 	@SqlQuery("select * from Room")
 	List<Room> getAll();
 
 	@SqlUpdate("delete from Room where id = :it")
-	void deleteById(@Bind int id);
+	void deleteById(@Bind long id);
 }

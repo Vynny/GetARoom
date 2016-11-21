@@ -48,7 +48,7 @@ public class ReservationController {
     @GET
     @Path("/{id}")
     @Timed
-    public Reservation getReservation(@PathParam("id") Integer id) {
+    public Reservation getReservation(@PathParam("id") Long id) {
     	Reservation reservation = reservationMapper.get(id);
     	if (reservation != null) {
             return reservation;
@@ -61,7 +61,7 @@ public class ReservationController {
     @Timed
     public ReservationMessage createReservation(ReservationMessage message) {
     	logger.info("Got message: \n\t" + message);
-    	Hashtable<Integer, QueueNode> nodeTable = getGraph();
+    	Hashtable<Long, QueueNode> nodeTable = getGraph();
     	LinkedList<Long> parents = new LinkedList<Long>();
     	ReservationSession session = reservationSessionManager.getSessionByUserId(message.getUserId());
 
@@ -71,7 +71,7 @@ public class ReservationController {
     		if (res.isCollision(message.getStartTime(), message.getEndTime())) {
     			collision = true;
     			
-    			if (nodeTable.containsKey((int)res.getId())) {
+    			if (nodeTable.containsKey(res.getId())) {
     				// handle elements in the queue separately
     				known = true;
     			}
@@ -99,11 +99,11 @@ public class ReservationController {
     @GET
     @Path("/{id}/cancel")
     @Timed
-    public Response.Status cancelReservation(@PathParam("id") Integer id) {
+    public Response.Status cancelReservation(@PathParam("id") Long id) {
     	Reservation reservation = reservationMapper.get(id);
     	if (reservation != null) {
-    		Hashtable<Integer, QueueNode> nodeTable = getGraph();
-    		QueueNode node = nodeTable.get((int)reservation.getId());
+    		Hashtable<Long, QueueNode> nodeTable = getGraph();
+    		QueueNode node = nodeTable.get(reservation.getId());
     		
     		if (node == null) {
     			// nothing to do, no dependencies. Just cancel
@@ -116,9 +116,9 @@ public class ReservationController {
 	    				node.removeChild(child);
 	    				if (child.parentsEmpty()) {
 	    					// get by user from child userId, remove all collisions
-	    					//for (Reservation res : getReservationByUser((int)child.getReservation().getuserId())) {
+	    					//for (Reservation res : getReservationByUser(child.getReservation().getuserId())) {
 	    						//if (res.isCollision(child.getReservation().getStart_time(), child.getReservation().getEnd_time())) {
-	    							//cancelReservation((int)child.getReservationId());
+	    							//cancelReservation(child.getReservationId());
 	    						//}
 	    					//}
 	    	    			reservationMapper.removeFromWaitlist(child.getReservation());
@@ -142,9 +142,9 @@ public class ReservationController {
 	    					}
 	    				}
 	    				if (!collision) {
-	    					//for (Reservation res : getReservationByUser((int)child.getReservation().getuserId())) {
+	    					//for (Reservation res : getReservationByUser(child.getReservation().getuserId())) {
 	    						//if (res.isCollision(child.getReservation().getStart_time(), child.getReservation().getEnd_time())) {
-	    							//cancelReservation((int)child.getReservationId());
+	    							//cancelReservation(child.getReservationId());
 	    						//}
 	    					//}
 	    	    			reservationMapper.removeFromWaitlist(child.getReservation());
@@ -163,7 +163,7 @@ public class ReservationController {
     @GET
     @Path("/getbyroom/{id}")
     @Timed
-    public List<Reservation> getReservationByRoom(@PathParam("id") Integer id) {
+    public List<Reservation> getReservationByRoom(@PathParam("id") Long id) {
     	List<Reservation> reservations = reservationMapper.getByRoom(id);
     	if (!reservations.isEmpty()) {
             return reservations;
@@ -175,7 +175,7 @@ public class ReservationController {
     @GET
     @Path("/getbyuser/{id}")
     @Timed
-    public List<Reservation> getReservationByUser(@PathParam("id") Integer id) {
+    public List<Reservation> getReservationByUser(@PathParam("id") Long id) {
     	List<Reservation> reservations = reservationMapper.getByUser(id);
     	if (!reservations.isEmpty()) {
             return reservations;
@@ -185,7 +185,7 @@ public class ReservationController {
     }
         
     // Get parentless nodes on the graph (reservations with queue dependencies)
-	private List<QueueNode> getParentlessNodes(Hashtable<Integer, QueueNode> table) {
+	private List<QueueNode> getParentlessNodes(Hashtable<Long, QueueNode> table) {
 		LinkedList<QueueNode> parents = new LinkedList<QueueNode>();
 						
 		for (QueueNode node : table.values()) {
@@ -201,13 +201,13 @@ public class ReservationController {
 	}
 	
 	// Build queue graph from DB edges
-	private Hashtable<Integer, QueueNode> getGraph() {
-		Hashtable<Integer, QueueNode> table = new Hashtable<Integer, QueueNode>();				
+	private Hashtable<Long, QueueNode> getGraph() {
+		Hashtable<Long, QueueNode> table = new Hashtable<Long, QueueNode>();				
 		List<QueueNodeEdge> all = queueNodeEdgeMapper.getAll();
 		
 		for (QueueNodeEdge edge : all) {
-			int pid = (int)edge.getParentId();
-			int cid = (int)edge.getChildId();
+			long pid = edge.getParentId();
+			long cid = edge.getChildId();
 			
 			if (!table.containsKey(pid)) {
 				table.put(pid, new QueueNode(reservationMapper.get(pid)));

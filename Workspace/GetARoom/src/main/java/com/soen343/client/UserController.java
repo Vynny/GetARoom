@@ -67,7 +67,7 @@ public class UserController {
         }
     }
     
-    public User getUser(int id) {
+    public User getUser(long id) {
     	return userMapper.get(id);
     }
     

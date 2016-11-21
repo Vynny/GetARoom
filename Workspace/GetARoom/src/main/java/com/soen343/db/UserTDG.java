@@ -21,7 +21,7 @@ public interface UserTDG {
 	void update(@BindBean("r") User user);
 
 	@SqlQuery("select * from User where id = :id")
-	User findById(@Bind("id") int id);
+	User findById(@Bind("id") long id);
 	
 	@SqlQuery("select * from User where username = :username")
 	User findByUsername(@Bind("username") String username);
@@ -30,5 +30,5 @@ public interface UserTDG {
 	List<User> getAll();
 
 	@SqlUpdate("delete from User where id = :it")
-	void deleteById(@Bind int id);
+	void deleteById(@Bind long id);
 }

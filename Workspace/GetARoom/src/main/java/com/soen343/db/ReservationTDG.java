@@ -24,13 +24,13 @@ public interface ReservationTDG {
 	void update(@BindBean("r") Reservation reservation);
 	
 	@SqlQuery("select * from Reservation where id = :id")
-	Reservation findById(@Bind("id") int id);
+	Reservation findById(@Bind("id") long id);
 	
 	@SqlQuery("select * from Reservation where user_id = :id")
-	List<Reservation> findByUserId(@Bind("id") int id);
+	List<Reservation> findByUserId(@Bind("id") long id);
 
 	@SqlQuery("select * from Reservation where room_id = :id")
-	List<Reservation> findByRoomId(@Bind("id") int id);
+	List<Reservation> findByRoomId(@Bind("id") long id);
 	
 	@SqlQuery("select * from Reservation")
 	List<Reservation> getAll();
