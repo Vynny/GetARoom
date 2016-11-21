@@ -16,7 +16,7 @@ public interface QueueNodeEdgeTDG {
 	@SqlQuery("select MAX(id) from QueueNodeEdge")
 	long getMaxID();
 	
-	@SqlUpdate("insert into QueueNodeEdge (id, parent_id, child_id) values (:id, :parentId, :childId")
+	@SqlUpdate("insert into QueueNodeEdge (id, parent_id, child_id) values (:id, :parentId, :childId)")
 	void insert(@BindBean QueueNodeEdge edge);
 	
 	@SqlUpdate("delete from QueueNodeEdge where id = :id")

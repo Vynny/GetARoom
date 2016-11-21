@@ -83,7 +83,7 @@ public class ReservationController {
     	}
     	
     	if (known) {
-			List<QueueNode> newParents = QueueNode.getNewParents(message.getStartTime(), message.getEndTime(), getParentNodes());
+			List<QueueNode> newParents = QueueNode.getNewParents(message.getStartTime(), message.getEndTime(), getParentlessNodes(nodeTable));
 			for (QueueNode np : newParents) {
 				parents.add(np.getReservationId());
 			}
@@ -99,7 +99,7 @@ public class ReservationController {
     @GET
     @Path("/{id}/cancel")
     @Timed
-    public Reservation cancelReservation(@PathParam("id") Integer id) {
+    public Response.Status cancelReservation(@PathParam("id") Integer id) {
     	Reservation reservation = reservationMapper.get(id);
     	if (reservation != null) {
     		Hashtable<Integer, QueueNode> nodeTable = getGraph();
@@ -115,6 +115,12 @@ public class ReservationController {
 	    				queueNodeEdgeMapper.remove(node.getReservationId(), child.getReservationId());
 	    				node.removeChild(child);
 	    				if (child.parentsEmpty()) {
+	    					// get by user from child userId, remove all collisions
+	    					for (Reservation res : getReservationByUser((int)child.getReservation().getuserId())) {
+	    						if (res.isCollision(child.getReservation().getStart_time(), child.getReservation().getEnd_time())) {
+	    							cancelReservation((int)child.getReservationId());
+	    						}
+	    					}
 	    	    			reservationMapper.removeFromWaitlist(child.getReservation());
 	    				}
 	    			}
@@ -136,14 +142,19 @@ public class ReservationController {
 	    					}
 	    				}
 	    				if (!collision) {
-	    					reservationMapper.removeFromWaitlist(child.getReservation());
+	    					for (Reservation res : getReservationByUser((int)child.getReservation().getuserId())) {
+	    						if (res.isCollision(child.getReservation().getStart_time(), child.getReservation().getEnd_time())) {
+	    							cancelReservation((int)child.getReservationId());
+	    						}
+	    					}
+	    	    			reservationMapper.removeFromWaitlist(child.getReservation());
 	    				}
 	    			}
 	    		}
 	    	}
     		
     		reservationMapper.delete(reservation);
-    		return reservation;
+    		return Response.Status.OK;
         } else {
             throw new WebApplicationException(Response.Status.NO_CONTENT);
         }
@@ -172,10 +183,9 @@ public class ReservationController {
             throw new WebApplicationException(Response.Status.NO_CONTENT);
         }
     }
-    
-    // Helper class to construct tree from edges
-	private List<QueueNode> getParentNodes() {
-		Hashtable<Integer, QueueNode> table = getGraph();
+        
+    // Get parentless nodes on the graph (reservations with queue dependencies)
+	private List<QueueNode> getParentlessNodes(Hashtable<Integer, QueueNode> table) {
 		LinkedList<QueueNode> parents = new LinkedList<QueueNode>();
 						
 		for (QueueNode node : table.values()) {
@@ -190,6 +200,7 @@ public class ReservationController {
 		return parents;
 	}
 	
+	// Build queue graph from DB edges
 	private Hashtable<Integer, QueueNode> getGraph() {
 		Hashtable<Integer, QueueNode> table = new Hashtable<Integer, QueueNode>();				
 		List<QueueNodeEdge> all = queueNodeEdgeMapper.getAll();

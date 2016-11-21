@@ -51,7 +51,9 @@ public class ReservationMapper implements Mapper<Reservation> {
 		Reservation reservation = (Reservation) reservationIdentityMapper.get(id);
 		if (reservation == null) {
 			reservation = reservationTDG.findById(id);
+			if (reservation != null) {
 			reservationIdentityMapper.add(reservation);
+			}
 		}
 		return reservation;
 	}
@@ -90,6 +92,7 @@ public class ReservationMapper implements Mapper<Reservation> {
 
 	@Override
 	public void delete(Reservation o) {
+		reservationIdentityMapper.delete(o.getId());
 		reservationTDG.deleteById(o.getId());
 	}
 

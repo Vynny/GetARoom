@@ -51,7 +51,7 @@ public class QueueNode {
 			if (cursor.getReservation().isCollision(start, end)) {
 				List<QueueNode> below = getNewParents(start, end, cursor.getChildren());
 				if (below.isEmpty()) {
-					newParents.addLast(cursor);
+					newParents.add(cursor);
 				}
 				else {
 					return below;

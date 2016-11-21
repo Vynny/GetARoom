@@ -75,9 +75,8 @@ public class Reservation implements DomainObject {
 	}
 	
 	public boolean isCollision(DateTime start, DateTime end) {
-		return (start.isAfter(start_time) && start.isBefore(end_time)) ||
-				(end.isAfter(start_time) && end.isBefore(end_time)) ||
-				(start.isBefore(start_time) && end.isAfter(end_time));
-
+		return ((start.isAfter(start_time) || start.isEqual(start_time)) && (start.isBefore(end_time)) || 
+				(end.isAfter(start_time)) && (end.isBefore(end_time) || (end.isEqual(end_time))) ||
+				(start.isBefore(start_time) && end.isAfter(end_time)));
 	}
 }

@@ -29,8 +29,8 @@ CREATE TABLE `QueueNodeEdge` (
   PRIMARY KEY (`id`),
   KEY `parent_id` (`parent_id`),
   KEY `child_id` (`child_id`),
-  CONSTRAINT `QueueNodeEdge_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `Reservation` (`id`),
-  CONSTRAINT `QueueNodeEdge_ibfk_2` FOREIGN KEY (`child_id`) REFERENCES `Reservation` (`id`)
+  CONSTRAINT `QueueNodeEdge_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `Reservation` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `QueueNodeEdge_ibfk_2` FOREIGN KEY (`child_id`) REFERENCES `Reservation` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -51,9 +51,9 @@ CREATE TABLE `Reservation` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `room_id` (`room_id`),
-  CONSTRAINT `Reservation_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `User` (`id`),
-  CONSTRAINT `Reservation_ibfk_2` FOREIGN KEY (`room_id`) REFERENCES `Room` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+  CONSTRAINT `Reservation_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `User` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `Reservation_ibfk_2` FOREIGN KEY (`room_id`) REFERENCES `Room` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -83,7 +83,7 @@ CREATE TABLE `User` (
   `password` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -95,4 +95,4 @@ CREATE TABLE `User` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-11-17 20:26:16
+-- Dump completed on 2016-11-21  2:18:35
