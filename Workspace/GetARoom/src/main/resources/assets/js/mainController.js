@@ -70,7 +70,7 @@ angular.module('mainController', [])
 
         $scope.modifyClick = function(reservationItem) {
             if (reservationItem.canModify) {
-                ReservationService.initiateReservationSession(UserService.getCurrentUser().userId, reservationItem.roomId , reservationItem.dayObj ).then(function(response) {
+                ReservationService.initiateReservationSession(UserService.getCurrentUser().userId, reservationItem.roomId, reservationItem.dayObj).then(function(response) {
                     $state.go('userpanel.modify', { date: reservationItem.dayObj, reservationId: reservationItem.id, roomId: reservationItem.roomId });
                 });
             }
@@ -92,7 +92,9 @@ angular.module('mainController', [])
     }).controller('ModifyCtrl', function($scope, $state, $resource, $stateParams, UserService, ReservationService, RoomService) {
         $scope.thisroom = RoomService.getRoomObj($stateParams.roomId);
         $scope.modifyButtonText = "Confirm Modification";
-        $scope.deleteButtonText = "Delete Reservation";
+        $scope.deleteButtonText = "Cancel Reservation";
+
+        $scope.withinTimeslotLimit = true;
 
         $scope.startTime;
         $scope.endTime;
@@ -109,25 +111,50 @@ angular.module('mainController', [])
                 response.data.forEach(function(reservation) {
                     console.log("Got: " + JSON.stringify(reservation));
                     var username;
-
+                    /*
+                    backgroundColor: '#e67e22',
+                                                    borderColor: '#e67e22'*/
                     UserService.getUsername(reservation.userId).then(function(r) {
                         username = r.data.username;
                         if ($stateParams.reservationId == reservation.id) {
-                            var resToEdit = {
-                                title: username,
-                                start: moment(reservation.start_time),
-                                end: moment(reservation.end_time),
-                                editable: true
-                            };
+                            var resToEdit;
+                            if (!reservation.waitlisted) {
+                                resToEdit = {
+                                    title: username,
+                                    start: moment(reservation.start_time),
+                                    end: moment(reservation.end_time),
+                                    editable: true
+                                };
+                            } else {
+                                var resToEdit = {
+                                    title: username,
+                                    start: moment(reservation.start_time),
+                                    end: moment(reservation.end_time),
+                                    editable: true,
+                                    backgroundColor: '#e67e22',
+                                    borderColor: '#e67e22'
+                                };
+                            }
                             $scope.events.push(resToEdit);
                             $scope.startTime = resToEdit.start.format('lll');
                             $scope.endTime = resToEdit.end.format('lll');
                         } else {
-                            $scope.events.push({
-                                title: username,
-                                start: moment(reservation.start_time),
-                                end: moment(reservation.end_time)
-                            })
+                            if (!reservation.waitlisted) {
+                                $scope.events.push({
+                                    title: username,
+                                    start: moment(reservation.start_time),
+                                    end: moment(reservation.end_time)
+                                });
+                            } else {
+                                $scope.events.push({
+                                    title: username,
+                                    start: moment(reservation.start_time),
+                                    end: moment(reservation.end_time),
+                                    backgroundColor: '#e67e22',
+                                    borderColor: '#e67e22'
+                                });
+                            }
+
                         }
 
                     });
@@ -137,17 +164,29 @@ angular.module('mainController', [])
 
         $scope.confirmModify = function() {
 
-        },
+        };
 
         $scope.confirmDelete = function() {
-
-        },
+            ReservationService.deleteReservation($stateParams.reservationId).then(function(r) {
+                $scope.destroyReservationSession();
+                $scope.sessionActive = false;
+                $state.go('userpanel');
+            })
+        };
 
         $scope.onMove = function(event, delta, revertFunc) {
             $scope.startTime = event.start.format('lll');
             $scope.endTime = event.end.format('lll');
             $scope.startTimeObj = event.start;
             $scope.endTimeObj = event.end;
+
+             if (!ReservationService.isWithinAllowableTime(event.start, event.end)) {
+                $scope.withinTimeslotLimit = false;
+                $scope.modifyButtonText = "Reservation Exceeds " + ReservationService.maxReservationTime() + " hours!";
+            } else {
+                $scope.withinTimeslotLimit = true;
+                $scope.modifyButtonText = "Confirm Modification";
+            }
         };
 
         $scope.uiConfig = {
@@ -177,13 +216,13 @@ angular.module('mainController', [])
 
         $scope.destroyReservationSession = function() {
             console.log("Destroying Session");
-            ReservationService.destroyReservationSession(UserService.getCurrentUser().userId, $scope.thisroom.id, $stateParams.date);
+            ReservationService.destroyReservationSession(UserService.getCurrentUser().userId, $stateParams.roomId, $stateParams.date);
             $scope.sessionActive = false;
         };
 
         $scope.$on("$destroy", function() {
             if ($scope.sessionActive)
-                ReservationService.destroyReservationSession(UserService.getCurrentUser().userId, $scope.thisroom.id, $stateParams.date);
+                $scope.destroyReservationSession();
         });
     }).controller('RoomsCtrl', function($scope, $state, $resource, Room) {
         //Controller for all rooms page 
@@ -212,11 +251,21 @@ angular.module('mainController', [])
                     UserService.getUsername(reservation.userId).then(function(r) {
                         username = r.data.username;
                         console.log("username is " + username);
-                        $scope.events.push({
-                            title: username,
-                            start: moment(reservation.start_time),
-                            end: moment(reservation.end_time)
-                        })
+                        if (!reservation.waitlisted) {
+                            $scope.events.push({
+                                title: username,
+                                start: moment(reservation.start_time),
+                                end: moment(reservation.end_time)
+                            })
+                        } else {
+                            $scope.events.push({
+                                title: username,
+                                start: moment(reservation.start_time),
+                                end: moment(reservation.end_time),
+                                backgroundColor: '#e67e22',
+                                borderColor: '#e67e22'
+                            })
+                        }
                     });
                 });
             }
@@ -269,6 +318,7 @@ angular.module('mainController', [])
     }).controller('ReserveCtrl', function($scope, $state, $resource, $stateParams, $timeout, RoomService, ReservationService, UserService) {
         //Controller for single room page, reserve
         $scope.buttonText = "Reserve";
+        $scope.withinTimeslotLimit = true;
         $scope.counter = 4;
         $scope.counterTimeout;
 
@@ -300,17 +350,27 @@ angular.module('mainController', [])
             $scope.startTimeObj = start;
             $scope.endTimeObj = end;
             $scope.hideReservationView = false;
+
+            if (!ReservationService.isWithinAllowableTime(start, end)) {
+                $scope.withinTimeslotLimit = false;
+                $scope.buttonText = "Reservation Exceeds " + ReservationService.maxReservationTime() + " hours!";
+            } else {
+                $scope.withinTimeslotLimit = true;
+                $scope.buttonText = "Reserve";
+            }
         };
 
         $scope.confirmReservation = function() {
-            ReservationService.createReservation(UserService.getCurrentUser().userId, $scope.thisroom.id, $scope.startTimeObj.format(), $scope.endTimeObj.format()).then(function(response) {
-                console.log(JSON.stringify(response));
-            });
-            $scope.counterTimeout = $timeout($scope.countdown, 0);
-            $timeout(function() {
-                $state.go('rooms.room');
-                $scope.destroyReservationSession();
-            }, 4000)
+            if ($scope.withinTimeslotLimit) {
+                ReservationService.createReservation(UserService.getCurrentUser().userId, $scope.thisroom.id, $scope.startTimeObj.format(), $scope.endTimeObj.format()).then(function(response) {
+                    console.log(JSON.stringify(response));
+                });
+                $scope.counterTimeout = $timeout($scope.countdown, 0);
+                $timeout(function() {
+                    $state.go('rooms.room');
+                    $scope.destroyReservationSession();
+                }, 4000)
+            }
         }
 
         $scope.countdown = function() {
@@ -347,6 +407,6 @@ angular.module('mainController', [])
         };
         $scope.$on("$destroy", function() {
             if ($scope.sessionActive)
-                ReservationService.destroyReservationSession(UserService.getCurrentUser().userId, $scope.thisroom.id, $scope.reserveDayObj);
+                $scope.destroyReservationSession();
         });
     });

@@ -20,7 +20,7 @@ public class RoomMapper implements Mapper<Room> {
 		return roomTDG.getAll();
 	}
 
-	public Room get(int id) {
+	public Room get(long id) {
 		Room room = (Room) roomIdentityMapper.get(id);
 		if (room == null) {
 			room = roomTDG.findById(id);
@@ -28,7 +28,7 @@ public class RoomMapper implements Mapper<Room> {
 		return room;
 	}
 
-	public Room set(int id, String description) {
+	public Room set(long id, String description) {
 		return null;
 	}
 

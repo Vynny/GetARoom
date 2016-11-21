@@ -7,14 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.soen343.core.DomainObject;
+import com.soen343.core.QueueNodeEdge;
 import com.soen343.core.Reservation;
 import com.soen343.db.ReservationTDG;
 import com.soen343.idmappers.ReservationIdentityMap;
 import com.soen343.uow.UnitOfWork;
 
 public class ReservationMapper implements Mapper<Reservation> {
-	
-	final Logger logger = LoggerFactory.getLogger(ReservationMapper.class);
 	
 	private ReservationTDG reservationTDG;
 	private ReservationIdentityMap reservationIdentityMapper;
@@ -25,7 +24,6 @@ public class ReservationMapper implements Mapper<Reservation> {
 	}
 	
 	public long makeNew(long user_id, long room_id, boolean waitlisted, String start_time, String end_time) {
-		logger.info("\t Start Time TS: " + start_time.toString());
 		UnitOfWork uow = new UnitOfWork(this);
 		long newID = reservationTDG.getMaxID() + 1;
 		Reservation reservation = new Reservation(newID, user_id, room_id, waitlisted, start_time, end_time);
@@ -34,6 +32,28 @@ public class ReservationMapper implements Mapper<Reservation> {
 		uow.commit();
 		
 		return newID;
+	}
+	
+	public void modify(long reservation_id, boolean waitlisted, String start_time, String end_time) {
+		UnitOfWork uow = new UnitOfWork(this);
+		Reservation reservation = get(reservation_id);
+		reservation.setWaitlisted(waitlisted);
+		reservation.setStart_time(start_time);
+		reservation.setEnd_time(end_time);
+		
+		reservationIdentityMapper.delete(reservation_id);
+		reservationIdentityMapper.add(reservation);
+		
+		uow.registerDirty((DomainObject) reservation);
+		uow.commit();
+	}
+	
+	public void remove(long id) {
+		UnitOfWork uow = new UnitOfWork(this);
+		Reservation res = reservationTDG.findById(id);
+		reservationIdentityMapper.delete(id);
+		uow.registerDeleted(res);
+		uow.commit();
 	}
 	
 	public void removeFromWaitlist(Reservation reservation) {
@@ -47,7 +67,7 @@ public class ReservationMapper implements Mapper<Reservation> {
 		return reservationTDG.getAll();
 	}
 	
-	public Reservation get(int id) {
+	public Reservation get(long id) {
 		Reservation reservation = (Reservation) reservationIdentityMapper.get(id);
 		if (reservation == null) {
 			reservation = reservationTDG.findById(id);
@@ -58,7 +78,7 @@ public class ReservationMapper implements Mapper<Reservation> {
 		return reservation;
 	}
 	
-	public List<Reservation> getByRoom(int id) {
+	public List<Reservation> getByRoom(long id) {
 		List<Reservation> reservations = reservationIdentityMapper.getByRoomId(id);
 		if (reservations.isEmpty()) {
 			reservations = reservationTDG.findByRoomId(id);
@@ -69,7 +89,7 @@ public class ReservationMapper implements Mapper<Reservation> {
 		return reservations;
 	}
 
-	public List<Reservation> getByUser(int id) {
+	public List<Reservation> getByUser(long id) {
 		List<Reservation> reservations = reservationIdentityMapper.getByUserId(id);
 		if (reservations.isEmpty()) {
 			reservations = reservationTDG.findByUserId(id);
@@ -92,7 +112,6 @@ public class ReservationMapper implements Mapper<Reservation> {
 
 	@Override
 	public void delete(Reservation o) {
-		reservationIdentityMapper.delete(o.getId());
 		reservationTDG.deleteById(o.getId());
 	}
 

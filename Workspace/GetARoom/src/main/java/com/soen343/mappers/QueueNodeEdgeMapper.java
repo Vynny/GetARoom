@@ -44,7 +44,7 @@ public class QueueNodeEdgeMapper implements Mapper<QueueNodeEdge> {
 		return queueNodeEdgeTDG.getAll();
 	}
 
-	public QueueNodeEdge get(int id) {
+	public QueueNodeEdge get(long id) {
 		QueueNodeEdge queueNodeEdge = (QueueNodeEdge) queueNodeEdgeIdentityMapper.get(id);
 		if (queueNodeEdge == null) {
 			queueNodeEdge = queueNodeEdgeTDG.findById(id);

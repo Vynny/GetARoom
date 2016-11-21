@@ -65,6 +65,14 @@ public class Reservation implements DomainObject {
 	public void setWaitlisted(boolean waitlisted) {
 		this.waitlisted = waitlisted;
 	}
+	
+	public void setStart_time(String start_time) {
+		this.start_time = parseDate(start_time);
+	}
+	
+	public void setEnd_time(String end_time) {
+		this.end_time = parseDate(end_time);
+	}
 
 	public boolean isCollision(String start, String end) {
 		DateTime startDateTime, endDateTime;
