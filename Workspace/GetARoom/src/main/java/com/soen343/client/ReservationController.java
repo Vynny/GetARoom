@@ -115,12 +115,6 @@ public class ReservationController {
 	    				queueNodeEdgeMapper.remove(node.getReservationId(), child.getReservationId());
 	    				node.removeChild(child);
 	    				if (child.parentsEmpty()) {
-	    					// get by user from child userId, remove all collisions
-	    					//for (Reservation res : getReservationByUser(child.getReservation().getuserId())) {
-	    						//if (res.isCollision(child.getReservation().getStart_time(), child.getReservation().getEnd_time())) {
-	    							//cancelReservation(child.getReservationId());
-	    						//}
-	    					//}
 	    	    			reservationMapper.removeFromWaitlist(child.getReservation());
 	    				}
 	    			}
@@ -142,11 +136,6 @@ public class ReservationController {
 	    					}
 	    				}
 	    				if (!collision) {
-	    					//for (Reservation res : getReservationByUser(child.getReservation().getuserId())) {
-	    						//if (res.isCollision(child.getReservation().getStart_time(), child.getReservation().getEnd_time())) {
-	    							//cancelReservation(child.getReservationId());
-	    						//}
-	    					//}
 	    	    			reservationMapper.removeFromWaitlist(child.getReservation());
 	    				}
 	    			}
