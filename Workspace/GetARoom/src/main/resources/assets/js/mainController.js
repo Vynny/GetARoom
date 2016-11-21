@@ -94,6 +94,8 @@ angular.module('mainController', [])
         $scope.modifyButtonText = "Confirm Modification";
         $scope.deleteButtonText = "Cancel Reservation";
 
+        $scope.withinTimeslotLimit = true;
+
         $scope.startTime;
         $scope.endTime;
 
@@ -162,20 +164,30 @@ angular.module('mainController', [])
 
         $scope.confirmModify = function() {
 
-            },
+        };
 
-            $scope.confirmDelete = function() {
-                ReservationService.deleteReservation($stateParams.reservationId).then(function(r) {
-                    console.log(JSON.stringify(r));
-                })
-            },
+        $scope.confirmDelete = function() {
+            ReservationService.deleteReservation($stateParams.reservationId).then(function(r) {
+                $scope.destroyReservationSession();
+                $scope.sessionActive = false;
+                $state.go('userpanel');
+            })
+        };
 
-            $scope.onMove = function(event, delta, revertFunc) {
-                $scope.startTime = event.start.format('lll');
-                $scope.endTime = event.end.format('lll');
-                $scope.startTimeObj = event.start;
-                $scope.endTimeObj = event.end;
-            };
+        $scope.onMove = function(event, delta, revertFunc) {
+            $scope.startTime = event.start.format('lll');
+            $scope.endTime = event.end.format('lll');
+            $scope.startTimeObj = event.start;
+            $scope.endTimeObj = event.end;
+
+             if (!ReservationService.isWithinAllowableTime(event.start, event.end)) {
+                $scope.withinTimeslotLimit = false;
+                $scope.modifyButtonText = "Reservation Exceeds " + ReservationService.maxReservationTime() + " hours!";
+            } else {
+                $scope.withinTimeslotLimit = true;
+                $scope.modifyButtonText = "Confirm Modification";
+            }
+        };
 
         $scope.uiConfig = {
             calendar: {
@@ -204,13 +216,13 @@ angular.module('mainController', [])
 
         $scope.destroyReservationSession = function() {
             console.log("Destroying Session");
-            ReservationService.destroyReservationSession(UserService.getCurrentUser().userId, $scope.thisroom.id, $stateParams.date);
+            ReservationService.destroyReservationSession(UserService.getCurrentUser().userId, $stateParams.roomId, $stateParams.date);
             $scope.sessionActive = false;
         };
 
         $scope.$on("$destroy", function() {
             if ($scope.sessionActive)
-                ReservationService.destroyReservationSession(UserService.getCurrentUser().userId, $scope.thisroom.id, $stateParams.date);
+                $scope.destroyReservationSession();
         });
     }).controller('RoomsCtrl', function($scope, $state, $resource, Room) {
         //Controller for all rooms page 
@@ -306,6 +318,7 @@ angular.module('mainController', [])
     }).controller('ReserveCtrl', function($scope, $state, $resource, $stateParams, $timeout, RoomService, ReservationService, UserService) {
         //Controller for single room page, reserve
         $scope.buttonText = "Reserve";
+        $scope.withinTimeslotLimit = true;
         $scope.counter = 4;
         $scope.counterTimeout;
 
@@ -337,17 +350,27 @@ angular.module('mainController', [])
             $scope.startTimeObj = start;
             $scope.endTimeObj = end;
             $scope.hideReservationView = false;
+
+            if (!ReservationService.isWithinAllowableTime(start, end)) {
+                $scope.withinTimeslotLimit = false;
+                $scope.buttonText = "Reservation Exceeds " + ReservationService.maxReservationTime() + " hours!";
+            } else {
+                $scope.withinTimeslotLimit = true;
+                $scope.buttonText = "Reserve";
+            }
         };
 
         $scope.confirmReservation = function() {
-            ReservationService.createReservation(UserService.getCurrentUser().userId, $scope.thisroom.id, $scope.startTimeObj.format(), $scope.endTimeObj.format()).then(function(response) {
-                console.log(JSON.stringify(response));
-            });
-            $scope.counterTimeout = $timeout($scope.countdown, 0);
-            $timeout(function() {
-                $state.go('rooms.room');
-                $scope.destroyReservationSession();
-            }, 4000)
+            if ($scope.withinTimeslotLimit) {
+                ReservationService.createReservation(UserService.getCurrentUser().userId, $scope.thisroom.id, $scope.startTimeObj.format(), $scope.endTimeObj.format()).then(function(response) {
+                    console.log(JSON.stringify(response));
+                });
+                $scope.counterTimeout = $timeout($scope.countdown, 0);
+                $timeout(function() {
+                    $state.go('rooms.room');
+                    $scope.destroyReservationSession();
+                }, 4000)
+            }
         }
 
         $scope.countdown = function() {
@@ -384,6 +407,6 @@ angular.module('mainController', [])
         };
         $scope.$on("$destroy", function() {
             if ($scope.sessionActive)
-                ReservationService.destroyReservationSession(UserService.getCurrentUser().userId, $scope.thisroom.id, $scope.reserveDayObj);
+                $scope.destroyReservationSession();
         });
     });
