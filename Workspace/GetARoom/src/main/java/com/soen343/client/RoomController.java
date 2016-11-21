@@ -69,6 +69,7 @@ public class RoomController {
 	@POST
 	@Path("/verifyReservationSession")
 	public ReservationSessionMessage verifyReservationSession(ReservationSessionMessage request) {
+		logger.info("Request is: \n\t" + request);
 		ReservationSessionMessage response = request;
 
 		if (!reservationSessionManager.doesSessionExist(request)) {
