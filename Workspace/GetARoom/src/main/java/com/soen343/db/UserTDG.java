@@ -17,7 +17,7 @@ public interface UserTDG {
 	@SqlUpdate("insert into User (description) values (:description)")
 	void insert(@BindBean User user);
 
-	@SqlUpdate("update User set description = :r.description")
+	@SqlUpdate("update User set description = :r.description where id = :r.id")
 	void update(@BindBean("r") User user);
 
 	@SqlQuery("select * from User where id = :id")

@@ -17,10 +17,10 @@ public interface ReservationTDG {
 	@SqlQuery("select MAX(id) from Reservation")
 	long getMaxID();
 	
-	@SqlUpdate("insert into Reservation (user_id, room_id, waitlisted, start_time, end_time) values (:userId, :roomId, :waitlisted, :start_time, :end_time)")
+	@SqlUpdate("insert into Reservation (id, user_id, room_id, waitlisted, start_time, end_time) values (:id, :userId, :roomId, :waitlisted, :start_time, :end_time)")
 	void insert(@BindBean Reservation reservation);
 
-	@SqlUpdate("update Reservation set user_id = :r.userId, room_id = :r.roomId, waitlisted = :r.waitlisted, start_time = :r.start_time, end_time = :r.end_time")
+	@SqlUpdate("update Reservation set user_id = :r.userId, room_id = :r.roomId, waitlisted = :r.waitlisted, start_time = :r.start_time, end_time = :r.end_time where id = :r.id")
 	void update(@BindBean("r") Reservation reservation);
 	
 	@SqlQuery("select * from Reservation where id = :id")

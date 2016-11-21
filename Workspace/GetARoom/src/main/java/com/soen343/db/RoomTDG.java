@@ -17,7 +17,7 @@ public interface RoomTDG {
 	@SqlUpdate("insert into Room (description) values (:description)")
 	void insert(@BindBean Room room);
 
-	@SqlUpdate("update Room set description = :r.description")
+	@SqlUpdate("update Room set description = :r.description where id=:r.id")
 	void update(@BindBean("r") Room room);
 
 	@SqlQuery("select * from Room where id = :id")
