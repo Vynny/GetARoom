@@ -34,6 +34,20 @@ public class ReservationMapper implements Mapper<Reservation> {
 		return newID;
 	}
 	
+	public void modify(long reservation_id, boolean waitlisted, String start_time, String end_time) {
+		UnitOfWork uow = new UnitOfWork(this);
+		Reservation reservation = get(reservation_id);
+		reservation.setWaitlisted(waitlisted);
+		reservation.setStart_time(start_time);
+		reservation.setEnd_time(end_time);
+		
+		reservationIdentityMapper.delete(reservation_id);
+		reservationIdentityMapper.add(reservation);
+		
+		uow.registerDirty((DomainObject) reservation);
+		uow.commit();
+	}
+	
 	public void remove(long id) {
 		UnitOfWork uow = new UnitOfWork(this);
 		Reservation res = reservationTDG.findById(id);

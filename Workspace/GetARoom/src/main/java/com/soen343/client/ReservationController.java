@@ -44,7 +44,40 @@ public class ReservationController {
     	queueNodeEdgeMapper = new QueueNodeEdgeMapper(queueNodeEdgeTDG);
     	this.reservationSessionManager = reservationSessionManager;
     }
+    
+    @POST
+    @Timed
+    public ReservationModificationMessage modifyReservation(ReservationModificationMessage message) {
+    	logger.info("Modifying reservation with message: \n\t" + message);
+    	
+    	removeFromQueue(message.getId());
+    	List<Long> newParents = addToQueue(message.getStartTime(), message.getEndTime());    	
+    	ReservationSession session = reservationSessionManager.getSessionByUserId(message.getUserId());
+    	session.modifyReservation(message, !newParents.isEmpty());
+    	
+	    for (long i : newParents) {
+	    	queueNodeEdgeMapper.makeNew(i, message.getId());
+	    }
+    	
+    	return message;   	
+    }
+    
+    @POST
+    @Timed
+    public ReservationMessage createReservation(ReservationMessage message) {
+    	logger.info("Got message: \n\t" + message);
 
+    	List<Long> parents = addToQueue(message.getStartTime(), message.getEndTime());
+    	ReservationSession session = reservationSessionManager.getSessionByUserId(message.getUserId());   
+	    long id = session.makeReservation(message, !parents.isEmpty());
+	    
+	    for (long i : parents) {
+	    	queueNodeEdgeMapper.makeNew(i, id);
+	    }
+	    
+	    return message;
+    }
+    
     @GET
     @Path("/{id}")
     @Timed
@@ -74,45 +107,6 @@ public class ReservationController {
     		throw new WebApplicationException(Response.Status.NO_CONTENT);
     	}
     }
-        
-    @POST
-    @Timed
-    public ReservationMessage createReservation(ReservationMessage message) {
-    	logger.info("Got message: \n\t" + message);
-    	Hashtable<Long, QueueNode> nodeTable = getGraph();
-    	LinkedList<Long> parents = new LinkedList<Long>();
-    	ReservationSession session = reservationSessionManager.getSessionByUserId(message.getUserId());
-
-		boolean collision = false;
-		boolean known = false;
-    	for (Reservation res: reservationMapper.getAll()) {
-    		if (res.isCollision(message.getStartTime(), message.getEndTime())) {
-    			collision = true;
-    			
-    			if (nodeTable.containsKey(res.getId())) {
-    				// handle elements in the queue separately
-    				known = true;
-    			}
-    			else {
-    				// add dependencies to any reservations not in the queue
-    				parents.add(res.getId());
-    			}
-    		}
-    	}
-    	
-    	if (known) {
-			List<QueueNode> newParents = QueueNode.getNewParents(message.getStartTime(), message.getEndTime(), getParentlessNodes(nodeTable));
-			for (QueueNode np : newParents) {
-				parents.add(np.getReservationId());
-			}
-    	}
-    
-	    long id = session.makeReservation(message, collision);
-	    for (long i : parents) {
-	    	queueNodeEdgeMapper.makeNew(i, id);
-	    }
-	    return message;
-    }
 
     @GET
     @Path("/{id}/cancel")
@@ -120,46 +114,7 @@ public class ReservationController {
     public Response.Status cancelReservation(@PathParam("id") Long id) {
     	Reservation reservation = reservationMapper.get(id);
     	if (reservation != null) {
-    		Hashtable<Long, QueueNode> nodeTable = getGraph();
-    		QueueNode node = nodeTable.get(reservation.getId());
-    		
-    		if (node == null) {
-    			// nothing to do, no dependencies. Just cancel
-    		}
-    		else {
-	    		if (node.parentsEmpty()) {
-	    			// reservation was active, activate children
-	    			for (QueueNode child : node.getChildren()) {
-	    				queueNodeEdgeMapper.remove(node.getReservationId(), child.getReservationId());
-	    				node.removeChild(child);
-	    				if (child.parentsEmpty()) {
-	    	    			reservationMapper.removeFromWaitlist(child.getReservation());
-	    				}
-	    			}
-	    		}
-	    		else {
-	    			// Remove parent connections
-    				for (QueueNode parent : node.getParents()) {
-    					queueNodeEdgeMapper.remove(parent.getReservationId(), node.getReservationId());
-    				}
-    				
-	    			for (QueueNode child : node.getChildren()) {
-	    				queueNodeEdgeMapper.remove(node.getReservationId(), child.getReservationId());
-	    				// check collisions against parents, transfer dependencies
-	    				boolean collision = false;
-	    				for (QueueNode parent : node.getParents()) {
-	    					if (parent.getReservation().isCollision(child.getReservation().getStart_time(), child.getReservation().getEnd_time())) {
-	    						queueNodeEdgeMapper.makeNew(parent.getReservationId(), child.getReservationId());
-	    						collision = true;
-	    					}
-	    				}
-	    				if (!collision) {
-	    	    			reservationMapper.removeFromWaitlist(child.getReservation());
-	    				}
-	    			}
-	    		}
-	    	}
-    		
+    		removeFromQueue(reservation.getId());
     		reservationMapper.remove(reservation.getId());
     		return Response.Status.OK;
         } else {
@@ -189,6 +144,76 @@ public class ReservationController {
         } else {
             throw new WebApplicationException(Response.Status.NO_CONTENT);
         }
+    }
+    
+    private List<Long> addToQueue(String startTime, String endTime) {    	
+    	Hashtable<Long, QueueNode> nodeTable = getGraph();
+    	LinkedList<Long> parents = new LinkedList<Long>();
+
+		boolean known = false;
+		// Need to check against all reservations on roomday, they might not be in the queue
+    	for (Reservation res: reservationMapper.getAll()) {
+    		if (res.isCollision(startTime, endTime)) {    			
+    			if (nodeTable.containsKey(res.getId())) {
+    				// handle elements in the queue separately
+    				known = true;
+    			}
+    			else {
+    				// add dependencies to any reservations not in the queue
+    				parents.add(res.getId());
+    			}
+    		}
+    	}
+    	
+    	if (known) {
+			List<QueueNode> newParents = QueueNode.getNewParents(startTime, endTime, getParentlessNodes(nodeTable));
+			for (QueueNode np : newParents) {
+				parents.add(np.getReservationId());
+			}
+    	}
+    	
+    	return parents;
+    }
+    
+    private boolean removeFromQueue(Long reservationId) {
+		Hashtable<Long, QueueNode> nodeTable = getGraph();
+		QueueNode node = nodeTable.get(reservationId);
+		
+		if (node == null) {
+			return false; // Not in the queue
+		}
+		else {
+    		if (node.parentsEmpty()) {
+    			// reservation was active, activate children
+    			for (QueueNode child : node.getChildren()) {
+    				queueNodeEdgeMapper.remove(node.getReservationId(), child.getReservationId());
+    				if (child.getParents().size() == 1) {
+    	    			reservationMapper.removeFromWaitlist(child.getReservation());
+    				}
+    			}
+    		} else {
+    			// Remove parent connections
+				for (QueueNode parent : node.getParents()) {
+					queueNodeEdgeMapper.remove(parent.getReservationId(), node.getReservationId());
+				}
+    			for (QueueNode child : node.getChildren()) {
+    				queueNodeEdgeMapper.remove(node.getReservationId(), child.getReservationId());
+    				
+    				// check collisions against parents, transfer dependencies
+    				boolean collision = false;
+    				for (QueueNode parent : node.getParents()) {
+    					if (parent.getReservation().isCollision(child.getReservation().getStart_time(), child.getReservation().getEnd_time())) {
+    						queueNodeEdgeMapper.makeNew(parent.getReservationId(), child.getReservationId());
+    						collision = true;
+    					}
+    				}
+    				if (!collision) {
+    	    			reservationMapper.removeFromWaitlist(child.getReservation());
+    				}
+    			}
+    		}
+    		return true; // successfully removed reservation from queue
+    	}
     }
         
     // Get parentless nodes on the graph (reservations with queue dependencies)
