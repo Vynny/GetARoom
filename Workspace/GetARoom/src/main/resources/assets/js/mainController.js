@@ -328,7 +328,7 @@ angular.module('mainController', [])
             calendar: {
                 defaultDate: $stateParams.date,
                 defaultView: 'agendaDay',
-                height: 500,
+                height: 650,
                 editable: false,
                 selectable: true,
                 selectHelper: true,
