@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.soen343.core.DomainObject;
+import com.soen343.core.QueueNodeEdge;
 import com.soen343.core.Reservation;
 import com.soen343.db.ReservationTDG;
 import com.soen343.idmappers.ReservationIdentityMap;
@@ -34,6 +35,14 @@ public class ReservationMapper implements Mapper<Reservation> {
 		uow.commit();
 		
 		return newID;
+	}
+	
+	public void remove(long id) {
+		UnitOfWork uow = new UnitOfWork(this);
+		Reservation res = reservationTDG.findById((int)id);
+		reservationIdentityMapper.delete(id);
+		uow.registerDeleted(res);
+		uow.commit();
 	}
 	
 	public void removeFromWaitlist(Reservation reservation) {
@@ -92,7 +101,6 @@ public class ReservationMapper implements Mapper<Reservation> {
 
 	@Override
 	public void delete(Reservation o) {
-		reservationIdentityMapper.delete(o.getId());
 		reservationTDG.deleteById(o.getId());
 	}
 
