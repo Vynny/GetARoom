@@ -45,7 +45,7 @@ public class UnitOfWork {
 	}
 
 	private void updateDirty() {
-		Iterator<DomainObject> it = deletedDomainObjects.iterator();
+		Iterator<DomainObject> it = dirtyDomainObjects.iterator();
 		while (it.hasNext()) {
 			DomainObject obj = it.next();
 			dataMapper.save(obj);

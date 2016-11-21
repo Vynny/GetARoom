@@ -24,7 +24,7 @@ public class ReservationMapper implements Mapper<Reservation> {
 		this.reservationIdentityMapper = new ReservationIdentityMap();
 	}
 	
-	public void makeNew(long user_id, long room_id, boolean waitlisted, String start_time, String end_time) {
+	public long makeNew(long user_id, long room_id, boolean waitlisted, String start_time, String end_time) {
 		logger.info("\t Start Time TS: " + start_time.toString());
 		UnitOfWork uow = new UnitOfWork(this);
 		long newID = reservationTDG.getMaxID() + 1;
@@ -32,12 +32,14 @@ public class ReservationMapper implements Mapper<Reservation> {
 		reservationIdentityMapper.add((DomainObject) reservation);
 		uow.registerNew((DomainObject) reservation);
 		uow.commit();
+		
+		return newID;
 	}
 	
-	public void setWaitlisted(Reservation reservation, boolean waitlisted) {
+	public void removeFromWaitlist(Reservation reservation) {
 		UnitOfWork uow = new UnitOfWork(this);
+		reservation.setWaitlisted(false);
 		uow.registerDirty((DomainObject) reservation);
-		reservation.setWaitlisted(waitlisted);
 		uow.commit();
 	}
 		

@@ -5,12 +5,13 @@ import java.util.List;
 
 public class QueueNode {
 	private Reservation res;
-	private QueueNode parent;
+	private List<QueueNode> parents;
 	private List<QueueNode> children;
 	
 	public QueueNode(Reservation res) {
 		this.res = res;
 		children = new LinkedList<QueueNode>();
+		parents = new LinkedList<QueueNode>();
 	}
 	
 	public long getReservationId() {
@@ -22,27 +23,18 @@ public class QueueNode {
 	}
 	
 	public QueueNode addChild(QueueNode child) {
-		child.parent = this;
+		child.parents.add(this);
 		children.add(child);
 		return child;
 	}
-	
-	public QueueNode getRoot() {
-		QueueNode buf = this;
-		while (buf != null) {
-			buf = buf.parent;
-		}
-		
-		return buf;
-	}
-	
-	public QueueNode search(Reservation res, QueueNode node) {
+				
+	public static QueueNode search(Reservation res, QueueNode node) {
 	    if (node != null) {
 	        if (node.getReservationId() == res.getId()) {
 	           return node;
 	        }
 	        else {
-	        	for (QueueNode it : children) {
+	        	for (QueueNode it : node.getChildren()) {
 	        		QueueNode found = search(res, it);
 	        		if (found != null) {
 	        			return found;
@@ -53,36 +45,72 @@ public class QueueNode {
 	    return null;
 	}
 	
-	public List<QueueNode> timeslotCollisions(List<QueueNode> li, Reservation res, QueueNode node) {
-	    if (node != null) {
-	        if (node.getReservation().isCollision(res)) {
-	        	li.add(node);
-	        }
-        	for (QueueNode it : children) {
-        		li.addAll(timeslotCollisions(new LinkedList<QueueNode>(), res, it));
-        	}
-	    }
-	    return li;
+	public static List<QueueNode> getNewParents(String start, String end, List<QueueNode> cursors) {
+		LinkedList<QueueNode> newParents = new LinkedList<QueueNode>();
+		for (QueueNode cursor : cursors) {
+			if (cursor.getReservation().isCollision(start, end)) {
+				List<QueueNode> below = getNewParents(start, end, cursor.getChildren());
+				if (below.isEmpty()) {
+					newParents.addLast(cursor);
+				}
+				else {
+					return below;
+				}
+			}
+			else {
+				newParents.addAll(getNewParents(start, end, cursor.getChildren()));
+			}
+		}
+		return newParents;
 	}
 	
-	// returns parent
-	public QueueNode removeNode(Reservation target) {
-		QueueNode found = search(target, this);
-		if (found != null) {
-			QueueNode parent = found.parent;
-			parent.removeChild(found);
-			return parent;
+	public static List<QueueNode> getRoots(List<QueueNode> cursors) {
+		LinkedList<QueueNode> roots = new LinkedList<QueueNode>();
+		for (QueueNode cursor : cursors) {
+			if (cursor.parentsEmpty()) {
+				roots.add(cursor);
+			}
+			else {
+				roots.addAll(getRoots(cursor.getParents()));
+			}
 		}
-		else {
-			return null;
-		}
+		return roots;
+	}
+	
+	public List<QueueNode> getNewParents(String start, String end) {
+		List<QueueNode> newParents = new LinkedList<QueueNode>();
+		newParents.add(this);
+		return getNewParents(start, end, newParents);
+	}
+	
+	public List<QueueNode> getRoots() {
+		List<QueueNode> here = new LinkedList<QueueNode>();
+		here.add(this);
+		return getRoots(here);
+	}
+	
+	public QueueNode search(Reservation res) {
+		return search(res, this);
+	}
+		
+	public List<QueueNode> getChildren() {
+		return children;
+	}
+	
+	public List<QueueNode> getParents() {
+		return parents;
 	}
 	
 	public boolean childrenEmpty() {
 		return children.isEmpty();
 	}
 	
+	public boolean parentsEmpty() {
+		return parents.isEmpty();
+	}
+	
 	public void removeChild(QueueNode child) {
+		child.parents.remove(this);
 		children.remove(child);
 	}
 }
