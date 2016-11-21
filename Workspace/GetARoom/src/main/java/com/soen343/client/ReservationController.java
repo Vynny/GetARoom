@@ -56,6 +56,24 @@ public class ReservationController {
             throw new WebApplicationException(Response.Status.NO_CONTENT);
         }
     }
+    
+    @GET
+    @Path("/{id}/position")
+    @Timed
+    public long getReservationPosition(@PathParam("id") Long id) {
+    	Reservation reservation = reservationMapper.get(id);
+    	if (reservation != null) {
+    		Hashtable<Long, QueueNode> table = getGraph();
+    		if (table.containsKey(id)) {
+    			return table.get(id).getPosition();
+    		}
+    		else {
+    			return 0;
+    		}
+    	} else {
+    		throw new WebApplicationException(Response.Status.NO_CONTENT);
+    	}
+    }
         
     @POST
     @Timed

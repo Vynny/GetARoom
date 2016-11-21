@@ -45,6 +45,14 @@ public class QueueNode {
 	    return null;
 	}
 	
+	public static long getPosition(List<QueueNode> parentCursors) {
+		long sum = 0 ;
+		for (QueueNode parent : parentCursors) {
+			sum += getPosition(parent.getParents()) + 1;
+		}
+		return sum;
+	}
+	
 	public static List<QueueNode> getNewParents(String start, String end, List<QueueNode> cursors) {
 		LinkedList<QueueNode> newParents = new LinkedList<QueueNode>();
 		for (QueueNode cursor : cursors) {
@@ -75,6 +83,10 @@ public class QueueNode {
 			}
 		}
 		return roots;
+	}
+	
+	public long getPosition() {
+		return getPosition(parents);
 	}
 	
 	public List<QueueNode> getNewParents(String start, String end) {
