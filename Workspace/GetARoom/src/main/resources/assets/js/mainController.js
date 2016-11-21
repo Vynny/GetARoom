@@ -49,17 +49,141 @@ angular.module('mainController', [])
     }).controller('UserPanelCtrl', function($scope, $state, $resource, UserService, ReservationService, RoomService) {
         $scope.userReservations = [];
 
+        $scope.modifyButtonClass;
+        $scope.canModify = true;
+
         ReservationService.getByUser(UserService.getCurrentUser().userId).then(function(response) {
-            response.data.forEach(function(reservation) {
+            response.data.forEach(function(reservationItem) {
                 $scope.userReservations.push({
-                    id: reservation.id,
-                    roomId: reservation.roomId,
-                    roomDescription: RoomService.getRoomDescription(reservation.roomId),
-                    day: moment(reservation.start_time).format('MMM Do'),
-                    startTime: moment(reservation.start_time).format('h:mm a'),
-                    endTime: moment(reservation.end_time).format('h:mm a')
+                    id: reservationItem.id,
+                    roomId: reservationItem.roomId,
+                    roomDescription: RoomService.getRoomDescription(reservationItem.roomId),
+                    day: moment(reservationItem.start_time).format('MMM Do'),
+                    startTime: moment(reservationItem.start_time).format('h:mm a'),
+                    endTime: moment(reservationItem.end_time).format('h:mm a'),
+                    dayObj: moment(reservationItem.start_time),
+                    canModify: true,
+                    text: "Modify"
                 });
             })
+        });
+
+        $scope.modifyClick = function(reservationItem) {
+            if (reservationItem.canModify) {
+                ReservationService.initiateReservationSession(UserService.getCurrentUser().userId, reservationItem.roomId , reservationItem.dayObj ).then(function(response) {
+                    $state.go('userpanel.modify', { date: reservationItem.dayObj, reservationId: reservationItem.id, roomId: reservationItem.roomId });
+                });
+            }
+        };
+
+        $scope.modifyMouseOver = function(reservationItem) {
+            ReservationService.verifyReservationSession(UserService.getCurrentUser().userId, reservationItem.roomId, reservationItem.dayObj).then(function(response) {
+                console.log(JSON.stringify(response));
+                if (response.data.valid == true) {
+                    reservationItem.canModify = true;
+                    reservationItem.text = "Modify";
+                } else {
+                    reservationItem.canModify = false;
+                    reservationItem.text = "Busy!";
+                }
+            });
+        }
+
+    }).controller('ModifyCtrl', function($scope, $state, $resource, $stateParams, UserService, ReservationService, RoomService) {
+        $scope.thisroom = RoomService.getRoomObj($stateParams.roomId);
+        $scope.modifyButtonText = "Confirm Modification";
+        $scope.deleteButtonText = "Delete Reservation";
+
+        $scope.startTime;
+        $scope.endTime;
+
+        $scope.startTimeObj;
+        $scope.endTimeObj;
+
+        $scope.events = [];
+        $scope.eventSources = [$scope.events];
+
+        ReservationService.getByRoom($stateParams.roomId).then(function(response) {
+            console.log(response);
+            if (response.status !== 204) {
+                response.data.forEach(function(reservation) {
+                    console.log("Got: " + JSON.stringify(reservation));
+                    var username;
+
+                    UserService.getUsername(reservation.userId).then(function(r) {
+                        username = r.data.username;
+                        if ($stateParams.reservationId == reservation.id) {
+                            var resToEdit = {
+                                title: username,
+                                start: moment(reservation.start_time),
+                                end: moment(reservation.end_time),
+                                editable: true
+                            };
+                            $scope.events.push(resToEdit);
+                            $scope.startTime = resToEdit.start.format('lll');
+                            $scope.endTime = resToEdit.end.format('lll');
+                        } else {
+                            $scope.events.push({
+                                title: username,
+                                start: moment(reservation.start_time),
+                                end: moment(reservation.end_time)
+                            })
+                        }
+
+                    });
+                });
+            }
+        });
+
+        $scope.confirmModify = function() {
+
+        },
+
+        $scope.confirmDelete = function() {
+
+        },
+
+        $scope.onMove = function(event, delta, revertFunc) {
+            $scope.startTime = event.start.format('lll');
+            $scope.endTime = event.end.format('lll');
+            $scope.startTimeObj = event.start;
+            $scope.endTimeObj = event.end;
+        };
+
+        $scope.uiConfig = {
+            calendar: {
+                defaultDate: $stateParams.date,
+                defaultView: 'agendaDay',
+                height: 500,
+                editable: false,
+                selectOverlap: true,
+                unselectAuto: false,
+                allDaySlot: false,
+                minTime: RoomService.getMinTime(),
+                maxTime: RoomService.getMaxTime(),
+                eventResize: $scope.onMove,
+                eventDrop: $scope.onMove,
+                eventConstraint: {
+                    start: RoomService.getMinTimeString(),
+                    end: RoomService.getMaxTimeString()
+                },
+                header: {
+                    left: 'none',
+                    center: 'title',
+                    right: 'none'
+                }
+            }
+        };
+
+        $scope.destroyReservationSession = function() {
+            console.log("Destroying Session");
+            ReservationService.destroyReservationSession(UserService.getCurrentUser().userId, $scope.thisroom.id, $stateParams.date);
+            $scope.sessionActive = false;
+        };
+
+        $scope.$on("$destroy", function() {
+            if ($scope.sessionActive)
+                ReservationService.destroyReservationSession(UserService.getCurrentUser().userId, $scope.thisroom.id, $stateParams.date);
         });
     }).controller('RoomsCtrl', function($scope, $state, $resource, Room) {
         //Controller for all rooms page 
@@ -90,8 +214,8 @@ angular.module('mainController', [])
                         console.log("username is " + username);
                         $scope.events.push({
                             title: username,
-                            start: reservation.start_time,
-                            end: reservation.end_time
+                            start: moment(reservation.start_time),
+                            end: moment(reservation.end_time)
                         })
                     });
                 });
@@ -103,7 +227,7 @@ angular.module('mainController', [])
             $scope.reserveDay = date.format('MMM Do');
             $scope.hideReservationButton = false;
 
-            ReservationService.verifyReservationSession(UserService.getCurrentUser(), $scope.thisroom, $scope.reserveDayObj).then(function(response) {
+            ReservationService.verifyReservationSession(UserService.getCurrentUser().userId, $scope.thisroom.id, $scope.reserveDayObj).then(function(response) {
                 console.log(JSON.stringify(response));
                 if (response.data.valid == true) {
                     $scope.buttonText = "Reserve This Room On " + $scope.reserveDay;
@@ -117,7 +241,7 @@ angular.module('mainController', [])
 
         $scope.buttonClick = function() {
             if ($scope.buttonValid) {
-                ReservationService.initiateReservationSession(UserService.getCurrentUser(), $scope.thisroom, $scope.reserveDayObj).then(function(response) {
+                ReservationService.initiateReservationSession(UserService.getCurrentUser().userId, $scope.thisroom.id, $scope.reserveDayObj).then(function(response) {
                     console.log(JSON.stringify(response));
                     $state.go('rooms.room.reserve', { date: $scope.reserveDayObj, events: $scope.events });
                 });
@@ -158,13 +282,15 @@ angular.module('mainController', [])
         $scope.hideReservationView = true;
 
         $scope.thisroom = RoomService.getCurrentRoom();
+        console.log("This room: " + JSON.stringify($scope.thisroom));
+        console.log("User id is: " + UserService.getCurrentUser().userId);
         $scope.events = $stateParams.events;
         $scope.eventSources = [$scope.events];
 
 
         $scope.destroyReservationSession = function() {
             console.log("Destroying Session");
-            ReservationService.destroyReservationSession(UserService.getCurrentUser(), $scope.thisroom, $scope.reserveDayObj);
+            ReservationService.destroyReservationSession(UserService.getCurrentUser().userId, $scope.thisroom.id, $scope.reserveDayObj);
             $scope.sessionActive = false;
         };
 
@@ -177,7 +303,7 @@ angular.module('mainController', [])
         };
 
         $scope.confirmReservation = function() {
-            ReservationService.createReservation(UserService.getCurrentUser(), $scope.thisroom, $scope.startTimeObj.format(), $scope.endTimeObj.format()).then(function(response) {
+            ReservationService.createReservation(UserService.getCurrentUser().userId, $scope.thisroom.id, $scope.startTimeObj.format(), $scope.endTimeObj.format()).then(function(response) {
                 console.log(JSON.stringify(response));
             });
             $scope.counterTimeout = $timeout($scope.countdown, 0);
@@ -221,6 +347,6 @@ angular.module('mainController', [])
         };
         $scope.$on("$destroy", function() {
             if ($scope.sessionActive)
-                ReservationService.destroyReservationSession(UserService.getCurrentUser(), $scope.thisroom, $scope.reserveDayObj);
+                ReservationService.destroyReservationSession(UserService.getCurrentUser().userId, $scope.thisroom.id, $scope.reserveDayObj);
         });
     });

@@ -75,6 +75,22 @@
                     data: {
                         pageTitle: 'User Panel'
                     }
+                }).state('userpanel.modify', {
+                    url: "/modify",
+                    views: {
+                        '@': {
+                            templateUrl: viewsPrefix + "modify.html",
+                            controller: 'ModifyCtrl'
+                        }
+                    },
+                    data: {
+                        pageTitle: 'Modify Reservation'
+                    },
+                    params: {
+                        date: null,
+                        reservationId: null,
+                        roomId: null
+                    }
                 }).state('login', {
                     url: "/login",
                     controller: 'LoginCtrl',

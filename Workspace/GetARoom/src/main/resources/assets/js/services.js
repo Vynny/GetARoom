@@ -5,8 +5,10 @@ angular.module('getaroom.services', ['app'])
 
     var allRooms = $localStorage.rooms;
 
-    var minTime = moment.duration('07:00:00');
-    var maxTime = moment.duration('22:00:00');
+    var minTimeDuration = moment.duration('07:00:00');
+    var maxTimeDuration = moment.duration('22:00:00');
+    var minTimeString = "07:00";
+    var maxTimeString = "22:00";
 
     return {
         getAllRooms: function() {
@@ -30,15 +32,31 @@ angular.module('getaroom.services', ['app'])
             })
             return res;
         },
+        getRoomObj: function(roomId) {
+            var res;
+            console.log("LS: " + JSON.stringify($localStorage.rooms));
+            $localStorage.rooms.forEach(function(room) {
+                if (room.id == roomId) {
+                    res = room;
+                }
+            })
+            return res;
+        },
         getMinTime: function() {
-            return minTime;
+            return minTimeDuration;
         },
         getMaxTime: function() {
-            return maxTime;
+            return maxTimeDuration;
+        }, 
+        getMinTimeString: function() {
+            return minTimeString;
+        }, 
+        getMaxTimeString: function() {
+            return maxTimeString;
         }
     };
 }]).factory('UserService', ['$rootScope', '$localStorage', '$http', function($rootScope, $localStorage, $http) {
-    var currentUser = $localStorage.currentUser;
+    //var currentUser = $localStorage.currentUser;
 
     return {
         authenticateUser: function(username, password) {
@@ -49,7 +67,7 @@ angular.module('getaroom.services', ['app'])
                     if (response.token) {
                         //Persist user into local storage
                         $localStorage.currentUser = { userId: response.userId, username: username, token: response.token };
-                        currentUser = $localStorage.currentUser;
+                        //currentUser = $localStorage.currentUser;
                         //Set Authorization headers for user requests
                         $http.defaults.headers.common.Authorization = 'Bearer ' + response.token;
                         //Show sidebar and redirect to home view
@@ -59,10 +77,10 @@ angular.module('getaroom.services', ['app'])
         },
         logoutUser: function() {
             delete $localStorage.currentUser;
-            delete currentUser;
+            //delete currentUser;
         },
         getCurrentUser: function() {
-            return currentUser;
+            return $localStorage.currentUser;
         },
         getUsername: function(userId) {
             return $http.get($rootScope.apisrc + '/api/user/' + userId);
@@ -73,19 +91,17 @@ angular.module('getaroom.services', ['app'])
     //console.log(currentUser);
 
     return {
-        verifyReservationSession: function(currentUser, currentRoom, day) {
-            return $http.post($rootScope.apisrc + '/api/room/verifyReservationSession', { userId: currentUser.userId, roomId: currentRoom.id, day: day.format('YYYY-MM-DD') });
+        verifyReservationSession: function(userId, roomId, day) {
+            return $http.post($rootScope.apisrc + '/api/room/verifyReservationSession', { userId: userId, roomId: roomId, day: day.format('YYYY-MM-DD') });
         },
-        initiateReservationSession: function(currentUser, currentRoom, day) {
-            return $http.post($rootScope.apisrc + '/api/room/initateReservationSession', { userId: currentUser.userId, roomId: currentRoom.id, day: day.format('YYYY-MM-DD') });
+        initiateReservationSession: function(userId, roomId, day) {
+            return $http.post($rootScope.apisrc + '/api/room/initateReservationSession', { userId: userId, roomId: roomId, day: day.format('YYYY-MM-DD') });
         },
-        destroyReservationSession: function(currentUser, currentRoom, day) {
-            return $http.post($rootScope.apisrc + '/api/room/destroyReservationSession', { userId: currentUser.userId, roomId: currentRoom.id, day: day.format('YYYY-MM-DD') });
+        destroyReservationSession: function(userId, roomId, day) {
+            return $http.post($rootScope.apisrc + '/api/room/destroyReservationSession', { userId: userId, roomId: roomId, day: day.format('YYYY-MM-DD') });
         },
-        createReservation: function(user, room, startTime, endTime) {
-            var obj = { userId: user.userId, roomId: room.id, startTime: startTime, endTime: endTime };
-            console.log(JSON.stringify(obj));
-            return $http.post($rootScope.apisrc + '/api/reservation', { userId: user.userId, roomId: room.id, startTime: startTime, endTime: endTime });
+        createReservation: function(userId, roomId, startTime, endTime) {
+            return $http.post($rootScope.apisrc + '/api/reservation', { userId: userId, roomId: roomId, startTime: startTime, endTime: endTime });
         },
         getByRoom: function(roomId) {
             return $http.get($rootScope.apisrc + '/api/reservation/getbyroom/' + roomId);

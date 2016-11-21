@@ -20,7 +20,7 @@
         <div class="alert alert-warning" role="alert"> <span style="font-weight: bold; font-size: 2em;">Warning!</span><br>
           Canceling the class will make you lose your spot in the queue if another reservation is waiting for the time slot to be freed up!
         </div>
-        <table class="table table-striped">
+        <table class="table table-striped th-userpanel">
          <thread>
            <tr>
             <th>#</th>
@@ -29,54 +29,41 @@
             <th>Day</th>
             <th>Start Time</th>
             <th>End Time</th>
-            <th>Modifications</th>
-            <th>Delete</th>
+            <th>Actions</th>
           </tr>
         </thread>
         <tbody>
           <!--Testing repeating factor through table waiting for push of reservation ID and user ID-->
-          <tr ng-repeat = "reservation in userReservations">
-            <td>{{reservation.id}}</td>
-            <td><a ui-sref="rooms.room({ id: reservation.roomId })"> {{reservation.roomDescription}}</a></td>
+          <tr ng-repeat = "reservationItem in userReservations" class="td-userpanel">
+            <td>{{reservationItem.id}}</td>
+            <td><a ui-sref="rooms.room({ id: reservationItem.roomId })"> {{reservationItem.roomDescription}}</a></td>
             <td></td>
-            <td>{{reservation.day}}</td>
-            <td>{{reservation.startTime}}</td>
-            <td>{{reservation.endTime}}</td>
-            <td><button type="button" class="btn btn-block btn-danger">Modify</button></td>
-            <td>
-
-              <div class="dropdown">
-              <button class="btn btn-block btn-danger dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">Delete
-                  <span class="caret"></span></button>
-                  <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Confirm</a></li>
-                    <li role="presentation" class="divider"></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Cancel</a></li>
-                  </ul>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+            <td>{{reservationItem.day}}</td>
+            <td>{{reservationItem.startTime}}</td>
+            <td>{{reservationItem.endTime}}</td>
+            <td><button ng-click="modifyClick(reservationItem)" ng-mouseover="modifyMouseOver(reservationItem)" type="button" class="btn btn-block btn-success" ng-class="reservationItem.canModify ? 'btn btn-block btn-success' : 'btn btn-block btn-danger'">{{reservationItem.text}}</button></td>
+          </tr>
+        </tbody>
+      </table>
 
 
-        <div class="alert alert-info" role="alert">
-          <Strong style="font-size: 2em;">Careful!</Strong>
-          <p style= "font-size: 1em;">Modifications can apply the same restrictions as creating a new reservation. 
-          </p>
-          <br>
-          <p style= "font-size: 1em;">
-            Modifications that increases the time range of the reservation will be blocked if and only if it impedes the reserved time slot of a reservation that wasn't waiting for your reservation to finish beforehand or transcends the opening or closing time of the building housing the room in which the reservation takes place.
-          </p>
-          <br>
-          <p style="font-size:1em;">
-            Furthermore, if the reservation is reduced in time and the reservation being currently modified frees a time slot that was requested by a reservation further in the line than they are, that specific time slot will be taken with no possibility of taking it back with the exclusion of going back to the back of the reservation queue.
-          </p>
-        </div>
-
+      <div class="alert alert-info" role="alert">
+        <Strong style="font-size: 2em;">Careful!</Strong>
+        <p style= "font-size: 1em;">Modifications can apply the same restrictions as creating a new reservation. 
+        </p>
+        <br>
+        <p style= "font-size: 1em;">
+          Modifications that increases the time range of the reservation will be blocked if and only if it impedes the reserved time slot of a reservation that wasn't waiting for your reservation to finish beforehand or transcends the opening or closing time of the building housing the room in which the reservation takes place.
+        </p>
+        <br>
+        <p style="font-size:1em;">
+          Furthermore, if the reservation is reduced in time and the reservation being currently modified frees a time slot that was requested by a reservation further in the line than they are, that specific time slot will be taken with no possibility of taking it back with the exclusion of going back to the back of the reservation queue.
+        </p>
       </div>
+
     </div>
-
-
   </div>
+
+
+</div>
 </div>

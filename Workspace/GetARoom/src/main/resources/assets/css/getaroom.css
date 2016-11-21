@@ -126,7 +126,14 @@
   transform: translateY(80%);
 }
 
-#reserve-confirm button {
-
+.td-userpanel td {
+  text-align: center;
 }
 
+.th-userpanel th {
+  text-align: center;
+}
+
+#modpage-deletebutton {
+  margin-top: 35px;
+}
