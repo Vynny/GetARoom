@@ -114,6 +114,13 @@
                         pageTitle: 'UI'
                     }
                 })
+                .state('help', {
+                    url: "/help",
+                    templateUrl: viewsPrefix + "help.html",
+                    data: {
+                        pageTitle: 'Help'
+                    }
+                })
         }).run(function($rootScope, $http, $location, $localStorage) {
             //Keep user logged in between page refreshes
             if ($localStorage.currentUser) {
