@@ -46,6 +46,7 @@ public class ReservationController {
     }
     
     @POST
+    @Path("/modify")
     @Timed
     public ReservationModificationMessage modifyReservation(ReservationModificationMessage message) {
     	logger.info("Modifying reservation with message: \n\t" + message);
