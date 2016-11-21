@@ -13,7 +13,7 @@ public class QueueNodeEdgeJDBIMapper implements ResultSetMapper<QueueNodeEdge> {
 
 	@Override
 	public QueueNodeEdge map(int index, ResultSet r, StatementContext ctx) throws SQLException {
-		 return new QueueNodeEdge(r.getLong("id"), r.getLong("parentId"), r.getLong("childId"));
+		 return new QueueNodeEdge(r.getLong("id"), r.getLong("parent_id"), r.getLong("child_id"));
 	}
 
 }

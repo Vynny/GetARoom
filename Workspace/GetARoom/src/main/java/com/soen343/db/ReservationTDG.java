@@ -20,7 +20,7 @@ public interface ReservationTDG {
 	@SqlUpdate("insert into Reservation (user_id, room_id, waitlisted, start_time, end_time) values (:userId, :roomId, :waitlisted, :start_time, :end_time)")
 	void insert(@BindBean Reservation reservation);
 
-	@SqlUpdate("update Reservation set user_id = :r.user_id, room_id = :r.room_id, waitlisted = :r.waitlisted, start_time = :r.start_time, end_time = :r.end_time")
+	@SqlUpdate("update Reservation set user_id = :r.userId, room_id = :r.roomId, waitlisted = :r.waitlisted, start_time = :r.start_time, end_time = :r.end_time")
 	void update(@BindBean("r") Reservation reservation);
 	
 	@SqlQuery("select * from Reservation where id = :id")

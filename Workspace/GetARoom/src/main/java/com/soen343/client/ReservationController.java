@@ -56,50 +56,94 @@ public class ReservationController {
             throw new WebApplicationException(Response.Status.NO_CONTENT);
         }
     }
-    
+        
     @POST
     @Timed
     public ReservationMessage createReservation(ReservationMessage message) {
     	logger.info("Got message: \n\t" + message);
+    	Hashtable<Integer, QueueNode> nodeTable = getGraph();
+    	LinkedList<Long> parents = new LinkedList<Long>();
     	ReservationSession session = reservationSessionManager.getSessionByUserId(message.getUserId());
-    	session.makeReservation(message, false);
-    	/*Reservation newReservation = new Reservation((long)1, userId, roomId, true, start, end);
-    	List<QueueNode> roots = getTrees();
 
-    	for (Reservation res : reservationMapper.getAll()) {
-    		if (res.isCollision(newReservation)) {
-    			QueueNode newNode = new QueueNode(newReservation);
-    	    	for (QueueNode root : roots) {
-    	    		QueueNode resNode = root.search(res, root);
-    	    		if (resNode != null) {
-    	    			newNode.addChild(root);   
-    	    			queueNodeEdgeMapper.create(new QueueNodeEdge((long)1, newReservation.getId(), root.getReservationId()));
-    	    			return;
-    	    		}
-    	    	}
+		boolean collision = false;
+		boolean known = false;
+    	for (Reservation res: reservationMapper.getAll()) {
+    		if (res.isCollision(message.getStartTime(), message.getEndTime())) {
+    			collision = true;
+    			
+    			if (nodeTable.containsKey((int)res.getId())) {
+    				// handle elements in the queue separately
+    				known = true;
+    			}
+    			else {
+    				// add dependencies to any reservations not in the queue
+    				parents.add(res.getId());
+    			}
     		}
-    	}*/
-    	return message;
+    	}
+    	
+    	if (known) {
+			List<QueueNode> newParents = QueueNode.getNewParents(message.getStartTime(), message.getEndTime(), getParentNodes());
+			for (QueueNode np : newParents) {
+				parents.add(np.getReservationId());
+			}
+    	}
+    
+	    long id = session.makeReservation(message, collision);
+	    for (long i : parents) {
+	    	queueNodeEdgeMapper.makeNew(i, id);
+	    }
+	    return message;
     }
 
-    // Returns next reservation in queue
     @GET
     @Path("/{id}/cancel")
     @Timed
-    public void cancelReservation(@PathParam("id") Integer id) {
+    public Reservation cancelReservation(@PathParam("id") Integer id) {
     	Reservation reservation = reservationMapper.get(id);
     	if (reservation != null) {
-    		List<QueueNode> roots = getTrees();
-    		for (QueueNode root : roots) {
-	    		if (root != null) {
-		    		QueueNode parent = root.removeNode(reservation);
-		    		
-		       		if ((parent != null) && !(parent.childrenEmpty())) {
-		    			reservationMapper.setWaitlisted(parent.getReservation(), false);
-		    		}
-	    		}
-	    		reservationMapper.delete(reservation);
+    		Hashtable<Integer, QueueNode> nodeTable = getGraph();
+    		QueueNode node = nodeTable.get((int)reservation.getId());
+    		
+    		if (node == null) {
+    			// nothing to do, no dependencies. Just cancel
     		}
+    		else {
+	    		if (node.parentsEmpty()) {
+	    			// reservation was active, activate children
+	    			for (QueueNode child : node.getChildren()) {
+	    				queueNodeEdgeMapper.remove(node.getReservationId(), child.getReservationId());
+	    				node.removeChild(child);
+	    				if (child.parentsEmpty()) {
+	    	    			reservationMapper.removeFromWaitlist(child.getReservation());
+	    				}
+	    			}
+	    		}
+	    		else {
+	    			// Remove parent connections
+    				for (QueueNode parent : node.getParents()) {
+    					queueNodeEdgeMapper.remove(parent.getReservationId(), node.getReservationId());
+    				}
+    				
+	    			for (QueueNode child : node.getChildren()) {
+	    				queueNodeEdgeMapper.remove(node.getReservationId(), child.getReservationId());
+	    				// check collisions against parents, transfer dependencies
+	    				boolean collision = false;
+	    				for (QueueNode parent : node.getParents()) {
+	    					if (parent.getReservation().isCollision(child.getReservation().getStart_time(), child.getReservation().getEnd_time())) {
+	    						queueNodeEdgeMapper.makeNew(parent.getReservationId(), child.getReservationId());
+	    						collision = true;
+	    					}
+	    				}
+	    				if (!collision) {
+	    					reservationMapper.removeFromWaitlist(child.getReservation());
+	    				}
+	    			}
+	    		}
+	    	}
+    		
+    		reservationMapper.delete(reservation);
+    		return reservation;
         } else {
             throw new WebApplicationException(Response.Status.NO_CONTENT);
         }
@@ -130,10 +174,24 @@ public class ReservationController {
     }
     
     // Helper class to construct tree from edges
-	private List<QueueNode> getTrees() {
-		Hashtable<Integer, QueueNode> table = new Hashtable<Integer, QueueNode>();
-		LinkedList<QueueNode> roots = new LinkedList<QueueNode>();
-				
+	private List<QueueNode> getParentNodes() {
+		Hashtable<Integer, QueueNode> table = getGraph();
+		LinkedList<QueueNode> parents = new LinkedList<QueueNode>();
+						
+		for (QueueNode node : table.values()) {
+			List<QueueNode> currentRoots = node.getRoots();
+			for (QueueNode root : currentRoots) {
+				if (!parents.contains(root)) {
+					parents.add(root);
+				}
+			}
+		}
+		
+		return parents;
+	}
+	
+	private Hashtable<Integer, QueueNode> getGraph() {
+		Hashtable<Integer, QueueNode> table = new Hashtable<Integer, QueueNode>();				
 		List<QueueNodeEdge> all = queueNodeEdgeMapper.getAll();
 		
 		for (QueueNodeEdge edge : all) {
@@ -143,21 +201,14 @@ public class ReservationController {
 			if (!table.containsKey(pid)) {
 				table.put(pid, new QueueNode(reservationMapper.get(pid)));
 			}
-			if (!table.contains(cid)) {
+			if (!table.containsKey(cid)) {
 				table.put(cid, new QueueNode(reservationMapper.get(cid)));
 			}
 			
 			table.get(pid).addChild(table.get(cid));
 		}
 		
-		for (QueueNode node : table.values()) {
-			QueueNode currentRoot = node.getRoot();
-			if (!roots.contains(currentRoot)) {
-				roots.add(currentRoot);
-			}
-		}
-		
-		return roots;
+		return table;
 	}
 	
 	public ReservationMapper getReservationMapper() {

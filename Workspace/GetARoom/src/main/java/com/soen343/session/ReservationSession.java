@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.soen343.client.ReservationMessage;
+import com.soen343.core.Reservation;
 import com.soen343.mappers.ReservationMapper;
 
 public class ReservationSession {
@@ -20,15 +21,20 @@ public class ReservationSession {
 		this.day = day;
 	}
 	
-	public void makeReservation(ReservationMessage reservationInfo, boolean waitlisted) {
+	public long makeReservation(ReservationMessage reservationInfo, boolean waitlisted) {
 		logger.info("start timeTS: " + reservationInfo.getStartTime().toString());
-		ReservationSessionManager.reservationController.getReservationMapper().makeNew(reservationInfo.getUserId().longValue(), 
+		return ReservationSessionManager.reservationController.getReservationMapper().makeNew(reservationInfo.getUserId().longValue(), 
 				reservationInfo.getRoomId().longValue(), 
 				waitlisted, 
 				reservationInfo.getStartTime(), 
 				reservationInfo.getEndTime());
 	}
-
+	
+	public void setReservationActive(Reservation reservation) {
+		logger.info("Setting reservation " + reservation.getId() + " active.");
+		ReservationSessionManager.reservationController.getReservationMapper().removeFromWaitlist(reservation);
+	}
+	
 	public long getUserId() {
 		return userId;
 	}
