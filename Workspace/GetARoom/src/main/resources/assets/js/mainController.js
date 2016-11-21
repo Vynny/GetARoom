@@ -162,20 +162,21 @@ angular.module('mainController', [])
 
         $scope.confirmModify = function() {
 
-            },
+        };
 
-            $scope.confirmDelete = function() {
-                ReservationService.deleteReservation($stateParams.reservationId).then(function(r) {
-                    console.log(JSON.stringify(r));
-                })
-            },
+        $scope.confirmDelete = function() {
+            ReservationService.deleteReservation($stateParams.reservationId).then(function(r) {
+                $state.go('rooms.room');
+                //Session will be destroyed on $destroy
+            })
+        };
 
-            $scope.onMove = function(event, delta, revertFunc) {
-                $scope.startTime = event.start.format('lll');
-                $scope.endTime = event.end.format('lll');
-                $scope.startTimeObj = event.start;
-                $scope.endTimeObj = event.end;
-            };
+        $scope.onMove = function(event, delta, revertFunc) {
+            $scope.startTime = event.start.format('lll');
+            $scope.endTime = event.end.format('lll');
+            $scope.startTimeObj = event.start;
+            $scope.endTimeObj = event.end;
+        };
 
         $scope.uiConfig = {
             calendar: {

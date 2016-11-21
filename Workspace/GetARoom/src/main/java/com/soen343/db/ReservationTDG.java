@@ -35,6 +35,6 @@ public interface ReservationTDG {
 	@SqlQuery("select * from Reservation")
 	List<Reservation> getAll();
 
-	@SqlUpdate("delete from Reservation where id = :it")
-	void deleteById(@Bind long id);
+	@SqlUpdate("delete from Reservation where id = :id")
+	void deleteById(@Bind("id") long id);
 }
