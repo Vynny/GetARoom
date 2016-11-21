@@ -89,7 +89,7 @@ angular.module('getaroom.services', ['app'])
 }]).factory('ReservationService', ['$rootScope', '$localStorage', '$http', function($rootScope, $localStorage, $http) {
     // var currentUser = $localStorage.currentUser;
     //console.log(currentUser);
-
+    var maxReservationTime = 3;
     return {
         verifyReservationSession: function(userId, roomId, day) {
             return $http.post($rootScope.apisrc + '/api/room/verifyReservationSession', { userId: userId, roomId: roomId, day: day.format('YYYY-MM-DD') });
@@ -111,6 +111,14 @@ angular.module('getaroom.services', ['app'])
         },
         getByUser: function(userId) {
             return $http.get($rootScope.apisrc + '/api/reservation/getbyuser/' + userId);
+        },
+        isWithinAllowableTime: function(start, end) {
+            if  (moment.duration(end.diff(start)).asHours() > maxReservationTime)
+                return false;
+            return true;
+        },
+        maxReservationTime: function() {
+            return maxReservationTime;
         }
     };
 }]);
