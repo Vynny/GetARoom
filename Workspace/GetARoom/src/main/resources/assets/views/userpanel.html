@@ -1,0 +1,69 @@
+<div class="jumbotron">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="well well-sm">
+        <div class="media">
+          <a class="thumbnail pull-left" href="#">
+            <img class="media-object" src="../images/UserImage.png">
+          </a>
+          <div class="media-body">
+            <!-- Insert User ID from java -->
+            <h4 class="media-heading">{{username}}</h4>
+            <!-- Not really sure how to pull reservation numbers here or userID yet -->
+            <p><span class="label label-info">Reservations</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="well well-md">
+        <div class="alert alert-warning" role="alert"> <span style="font-weight: bold; font-size: 2em;">Warning!</span><br>
+          Canceling the class will make you lose your spot in the queue if another reservation is waiting for the time slot to be freed up!
+        </div>
+        <table class="table table-striped th-userpanel">
+         <thread>
+           <tr>
+            <th>#</th>
+            <th>Room</th>
+            <th>Position</th>
+            <th>Day</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Actions</th>
+          </tr>
+        </thread>
+        <tbody>
+          <!--Testing repeating factor through table waiting for push of reservation ID and user ID-->
+          <tr ng-repeat = "reservationItem in userReservations" class="td-userpanel">
+            <td>{{reservationItem.id}}</td>
+            <td><a ui-sref="rooms.room({ id: reservationItem.roomId })"> {{reservationItem.roomDescription}}</a></td>
+            <td></td>
+            <td>{{reservationItem.day}}</td>
+            <td>{{reservationItem.startTime}}</td>
+            <td>{{reservationItem.endTime}}</td>
+            <td><button ng-click="modifyClick(reservationItem)" ng-mouseover="modifyMouseOver(reservationItem)" type="button" class="btn btn-block btn-success" ng-class="reservationItem.canModify ? 'btn btn-block btn-success' : 'btn btn-block btn-danger'">{{reservationItem.text}}</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+
+      <div class="alert alert-info" role="alert">
+        <Strong style="font-size: 2em;">Careful!</Strong>
+        <p style= "font-size: 1em;">Modifications can apply the same restrictions as creating a new reservation. 
+        </p>
+        <br>
+        <p style= "font-size: 1em;">
+          Modifications that increases the time range of the reservation will be blocked if and only if it impedes the reserved time slot of a reservation that wasn't waiting for your reservation to finish beforehand or transcends the opening or closing time of the building housing the room in which the reservation takes place.
+        </p>
+        <br>
+        <p style="font-size:1em;">
+          Furthermore, if the reservation is reduced in time and the reservation being currently modified frees a time slot that was requested by a reservation further in the line than they are, that specific time slot will be taken with no possibility of taking it back with the exclusion of going back to the back of the reservation queue.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+
+</div>
+</div>

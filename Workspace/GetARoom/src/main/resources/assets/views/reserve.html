@@ -1,0 +1,38 @@
+<div id="reserve-page" class="container">
+  <div class="row">
+
+    <div class="col-md-12">
+      <div class="row">
+        <!-- <div class="page-header"> -->
+        <div class="col-md-4">
+          <h1><span class="label label-danger">Reserve: {{thisroom.description}}</span></h1>
+        </div>
+        <div class="col-md-offset-4 col-md-4 reserve-button">
+          <button ng-click="destroyReservationSession()" ui-sref="rooms.room" type="button" class="btn btn-danger">Back To View</button>
+        </div>
+        <!-- </div> -->
+      </div>
+      <div class="well">
+        <div class="starter-template">
+          <!-- <h1>Schedule</h1> -->
+          <div class="row">
+            <div class="col-md-12">
+              <div ui-calendar="uiConfig.calendar" ng-model="eventSources"></div>
+            </div>
+            <div ng-hide="hideReservationView" id="reservation-view" class="col-md-12">
+                <div class="col-md-offset-2 col-md-5">
+                  <h3>Start Time: {{startTime}}</h3>
+                  <hr>
+                  <h3>End Time: {{endTime}}</h3>
+                </div>
+                <div id="reserve-confirm" class="col-md-4">
+                  <button ng-click="confirmReservation()" type="button" class="btn btn-success btn-lg btn-block">{{buttonText}}</button>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /.container -->
