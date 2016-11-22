@@ -29,11 +29,13 @@ public class QueueNodeEdgeMapper implements Mapper<QueueNodeEdge> {
 	}
 	
 	public void remove(long parent_id, long child_id) {
-		UnitOfWork uow = new UnitOfWork(this);
 		QueueNodeEdge edge = queueNodeEdgeTDG.findByParentChildId(parent_id, child_id);
-		queueNodeEdgeIdentityMapper.delete(edge.getId());
-		uow.registerDeleted(edge);
-		uow.commit();
+		if (edge != null) {
+			UnitOfWork uow = new UnitOfWork(this);
+			queueNodeEdgeIdentityMapper.delete(edge.getId());
+			uow.registerDeleted(edge);
+			uow.commit();
+		}
 	}
 	
 	public long getMaxId() {
