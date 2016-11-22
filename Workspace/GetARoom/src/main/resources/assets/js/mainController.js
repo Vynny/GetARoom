@@ -89,7 +89,7 @@ angular.module('mainController', [])
             });
         }
 
-    }).controller('ModifyCtrl', function($scope, $state, $resource, $stateParams, UserService, ReservationService, RoomService) {
+    }).controller('ModifyCtrl', function($scope, $state, $resource, $stateParams, $timeout, UserService, ReservationService, RoomService) {
         $scope.thisroom = RoomService.getRoomObj($stateParams.roomId);
         $scope.modifyButtonText = "Confirm Modification";
         $scope.deleteButtonText = "Cancel Reservation";
@@ -111,9 +111,6 @@ angular.module('mainController', [])
                 response.data.forEach(function(reservation) {
                     console.log("Got: " + JSON.stringify(reservation));
                     var username;
-                    /*
-                    backgroundColor: '#e67e22',
-                                                    borderColor: '#e67e22'*/
                     UserService.getUsername(reservation.userId).then(function(r) {
                         username = r.data.username;
                         if ($stateParams.reservationId == reservation.id) {
@@ -163,7 +160,13 @@ angular.module('mainController', [])
         });
 
         $scope.confirmModify = function() {
-
+            ReservationService.modifyReservation(UserService.getCurrentUser().id, $stateParams.reservationId, $scope.startTimeObj, $scope.endTimeObj).then(function(r) {
+                $timeout(function() {
+                    $scope.destroyReservationSession();
+                    $scope.sessionActive = false;
+                    $state.go('userpanel');
+                }, 1500)
+            });
         };
 
         $scope.confirmDelete = function() {
@@ -171,7 +174,7 @@ angular.module('mainController', [])
                 $scope.destroyReservationSession();
                 $scope.sessionActive = false;
                 $state.go('userpanel');
-            })
+            });
         };
 
         $scope.onMove = function(event, delta, revertFunc) {
@@ -180,7 +183,7 @@ angular.module('mainController', [])
             $scope.startTimeObj = event.start;
             $scope.endTimeObj = event.end;
 
-             if (!ReservationService.isWithinAllowableTime(event.start, event.end)) {
+            if (!ReservationService.isWithinAllowableTime(event.start, event.end)) {
                 $scope.withinTimeslotLimit = false;
                 $scope.modifyButtonText = "Reservation Exceeds " + ReservationService.maxReservationTime() + " hours!";
             } else {

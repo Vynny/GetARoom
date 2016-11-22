@@ -103,6 +103,9 @@ angular.module('getaroom.services', ['app'])
         createReservation: function(userId, roomId, startTime, endTime) {
             return $http.post($rootScope.apisrc + '/api/reservation', { userId: userId, roomId: roomId, startTime: startTime, endTime: endTime });
         },
+        modifyReservation: function(userId, reservationId, startTime, endTime) {
+            return $http.post($rootScope.apisrc + '/api/reservation/modify', { userId: userId, reservationId: reservationId, startTime: startTime, endTime: endTime });
+        },
         deleteReservation: function(reservationId) {
             return $http.get($rootScope.apisrc + '/api/reservation/' + reservationId + '/cancel');
         },
