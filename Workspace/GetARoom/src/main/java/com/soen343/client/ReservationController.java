@@ -1,8 +1,10 @@
 package com.soen343.client;
 
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -71,18 +73,28 @@ public class ReservationController {
     
     @POST
     @Timed
-    public ReservationMessage createReservation(ReservationMessage message) {
-    	logger.info("Got message: \n\t" + message);
+    public Map<String, String> createReservation(ReservationMessage message) { 
+	    HashMap<String, String> returnMap = new HashMap<String, String>();
 
-    	List<Long> parents = addToQueue(message.getRoomId(), message.getStartTime(), message.getEndTime());
-    	ReservationSession session = reservationSessionManager.getSessionByUserId(message.getUserId());   
-	    long id = session.makeReservation(message, !parents.isEmpty());
-	    
-	    for (long i : parents) {
-	    	queueNodeEdgeMapper.makeNew(i, id);
-	    }
-	    
-	    return message;
+    	if (reservationMapper.getUserReservationPermitted(message.getUserId(), maxActiveReservations)) {
+        	logger.info("Adding message: \n\t" + message);
+
+	    	List<Long> parents = addToQueue(message.getRoomId(), message.getStartTime(), message.getEndTime());
+	    	ReservationSession session = reservationSessionManager.getSessionByUserId(message.getUserId());   
+		    long id = session.makeReservation(message, !parents.isEmpty());
+		    
+		    for (long i : parents) {
+		    	queueNodeEdgeMapper.makeNew(i, id);
+		    }
+		    
+		    returnMap.put("message", "Reservation made!");
+		    
+    	} else {
+        	logger.info("User over reservation limit from message: \n\t" + message);
+        	returnMap.put("message", "Limit of " + maxActiveReservations + " reached!");
+    	}
+    	
+	    return returnMap ;
     }
     
     @GET

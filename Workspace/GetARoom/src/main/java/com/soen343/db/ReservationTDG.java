@@ -26,6 +26,9 @@ public interface ReservationTDG {
 	@SqlQuery("select * from Reservation where id = :id")
 	Reservation findById(@Bind("id") long id);
 	
+	@SqlQuery("select COUNT(*) from Reservation where user_id = :id")
+	long getUserReservationCount(@Bind("id") long id);
+	
 	@SqlQuery("select * from Reservation where user_id = :id")
 	List<Reservation> findByUserId(@Bind("id") long id);
 

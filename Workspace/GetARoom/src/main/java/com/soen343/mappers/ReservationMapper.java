@@ -78,6 +78,10 @@ public class ReservationMapper implements Mapper<Reservation> {
 		return reservation;
 	}
 	
+	public boolean getUserReservationPermitted(long id, long allowed) {
+		return (reservationTDG.getUserReservationCount(id) < allowed);
+	}
+	
 	public List<Reservation> getByRoom(long id) {
 		List<Reservation> reservations = reservationIdentityMapper.getByRoomId(id);
 		if (reservations.isEmpty()) {
