@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.soen343.client.ReservationMessage;
+import com.soen343.client.ReservationModificationMessage;
 import com.soen343.core.Reservation;
 import com.soen343.mappers.ReservationMapper;
 
@@ -28,6 +29,10 @@ public class ReservationSession {
 				waitlisted, 
 				reservationInfo.getStartTime(), 
 				reservationInfo.getEndTime());
+	}
+	
+	public void modifyReservation(ReservationModificationMessage reservationInfo, boolean waitlisted) {
+		ReservationSessionManager.reservationController.getReservationMapper().modify(reservationInfo.getId(), waitlisted, reservationInfo.getStartTime(), reservationInfo.getEndTime());
 	}
 	
 	public void setReservationActive(Reservation reservation) {

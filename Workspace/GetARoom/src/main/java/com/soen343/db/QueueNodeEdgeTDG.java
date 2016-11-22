@@ -16,14 +16,14 @@ public interface QueueNodeEdgeTDG {
 	@SqlQuery("select MAX(id) from QueueNodeEdge")
 	long getMaxID();
 	
-	@SqlUpdate("insert into QueueNodeEdge (id, parent_id, child_id) values (:id, :parentId, :childId")
+	@SqlUpdate("insert into QueueNodeEdge (id, parent_id, child_id) values (:id, :parentId, :childId)")
 	void insert(@BindBean QueueNodeEdge edge);
 	
 	@SqlUpdate("delete from QueueNodeEdge where id = :id")
 	void delete(@BindBean QueueNodeEdge edge);
 	
 	@SqlQuery("select * from QueueNodeEdge where id = :id")
-	QueueNodeEdge findById(@Bind("id") int id);
+	QueueNodeEdge findById(@Bind("id") long id);
 	
 	@SqlQuery("select * from QueueNodeEdge where parent_id = :parentId and child_id = :childId")
 	QueueNodeEdge findByParentChildId(@Bind("parentId") long parentId, @Bind("childId") long childId);

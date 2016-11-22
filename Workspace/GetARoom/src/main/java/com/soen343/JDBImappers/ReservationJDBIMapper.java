@@ -12,7 +12,7 @@ public class ReservationJDBIMapper implements ResultSetMapper<Reservation> {
 
 	@Override
 	public Reservation map(int index, ResultSet r, StatementContext ctx) throws SQLException {
-		 return new Reservation(r.getInt("id"), r.getInt("user_id"), r.getInt("room_id"), r.getBoolean("waitlisted"), r.getString("start_time"), r.getString("end_time"));
+		 return new Reservation(r.getLong("id"), r.getLong("user_id"), r.getLong("room_id"), r.getBoolean("waitlisted"), r.getString("start_time"), r.getString("end_time"));
 	}
 
 }

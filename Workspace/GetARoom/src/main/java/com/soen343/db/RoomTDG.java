@@ -17,15 +17,15 @@ public interface RoomTDG {
 	@SqlUpdate("insert into Room (description) values (:description)")
 	void insert(@BindBean Room room);
 
-	@SqlUpdate("update Room set description = :r.description")
+	@SqlUpdate("update Room set description = :r.description where id=:r.id")
 	void update(@BindBean("r") Room room);
 
 	@SqlQuery("select * from Room where id = :id")
-	Room findById(@Bind("id") int id);
+	Room findById(@Bind("id") long id);
 
 	@SqlQuery("select * from Room")
 	List<Room> getAll();
 
 	@SqlUpdate("delete from Room where id = :it")
-	void deleteById(@Bind int id);
+	void deleteById(@Bind long id);
 }
