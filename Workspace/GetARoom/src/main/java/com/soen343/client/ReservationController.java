@@ -136,7 +136,8 @@ public class ReservationController {
     	Reservation reservation = reservationMapper.get(id);
     	if (reservation != null) {
     		removeFromQueue(reservation.getId());
-    		reservationMapper.remove(reservation.getId());
+	    	ReservationSession session = reservationSessionManager.getSessionByUserId(reservation.getuserId());   
+	    	session.cancelReservation(id);
     		return Response.Status.OK;
         } else {
             throw new WebApplicationException(Response.Status.NO_CONTENT);

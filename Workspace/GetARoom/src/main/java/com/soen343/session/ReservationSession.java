@@ -35,6 +35,10 @@ public class ReservationSession {
 		ReservationSessionManager.reservationController.getReservationMapper().modify(reservationInfo.getId(), waitlisted, reservationInfo.getStartTime(), reservationInfo.getEndTime());
 	}
 	
+	public void cancelReservation(long id) {
+		ReservationSessionManager.reservationController.getReservationMapper().remove(id);
+	}
+	
 	public void setReservationActive(Reservation reservation) {
 		logger.info("Setting reservation " + reservation.getId() + " active.");
 		ReservationSessionManager.reservationController.getReservationMapper().removeFromWaitlist(reservation);
