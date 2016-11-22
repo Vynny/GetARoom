@@ -1,0 +1,43 @@
+package com.soen343.session;
+
+import org.joda.time.DateTime;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class ReservationSessionMessage {
+
+	private long userId;
+	private DateTime day;
+	private boolean valid;
+	
+	public ReservationSessionMessage(long userId, DateTime day) {
+		this.valid = false;
+		this.userId = userId;
+		//this.roomId = roomId;
+		
+	}
+	@JsonProperty
+	public long getuserId() {
+		return this.userId;
+	}
+	
+/*	@JsonProperty
+	public long getroomId() {
+		return this.roomId;
+	}*/
+	
+	@JsonProperty
+	public boolean getValid() {
+		return valid;
+	}
+	
+	public void setValid(boolean valid) {
+		this.valid = valid;
+	}
+	
+	@JsonProperty
+	public DateTime getDay() {
+		return day;
+	}
+	
+}

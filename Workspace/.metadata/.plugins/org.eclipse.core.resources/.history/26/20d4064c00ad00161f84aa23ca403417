@@ -1,0 +1,10 @@
+package com.soen343.session;
+
+public class ReservationSessionManager {
+
+	private List<ReservationSession> sessionList;
+	
+	public ReservationSessionManager() {
+		
+	}
+}

@@ -1,0 +1,26 @@
+package com.soen343.session;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class ReservationSessionMessage {
+
+	private long userID;
+	private long roomID;
+	private boolean valid;
+	
+	public ReservationSessionMessage() {
+		this.valid = false;
+		this.userID = userID;
+		this.roomID = roomID;
+		
+	}
+	
+	@JsonProperty
+	public boolean getValid() {
+		return valid;
+	}
+	
+	public void setValid(boolean valid) {
+		this.valid = valid;
+	}
+}

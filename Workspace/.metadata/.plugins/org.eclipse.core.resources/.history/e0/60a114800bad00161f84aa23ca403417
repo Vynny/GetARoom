@@ -1,0 +1,62 @@
+package com.soen343.session;
+
+import org.joda.time.DateTime;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class ReservationSessionMessage {
+
+	private Long userId;
+	private Long roomId;
+	private DateTime day;
+	private Boolean valid;
+
+	//@JsonCreator
+	public ReservationSessionMessage(Long userId, Long roomId/*, String day*/) {
+		this.setUserId(userId);
+		this.setRoomId(roomId);
+		/*this.valid = false;
+		this.userId = userId;
+		this.roomId = roomId;*/
+		//this.day = DateTime.parse(day, ISODateTimeFormat.date());
+	}
+	
+	@JsonProperty
+	public Long getUserId() {
+		return userId;
+	}
+	@JsonProperty
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+	@JsonProperty
+	public Long getRoomId() {
+		return roomId;
+	}
+	@JsonProperty
+	public void setRoomId(Long roomId) {
+		this.roomId = roomId;
+	}
+	@JsonProperty
+	public DateTime getDay() {
+		return day;
+	}
+	@JsonProperty
+	public void setDay(DateTime day) {
+		this.day = day;
+	}
+	@JsonProperty
+	public Boolean getValid() {
+		return valid;
+	}
+	@JsonProperty
+	public void setValid(Boolean valid) {
+		this.valid = valid;
+	}
+
+	public String toString() {
+		//return "userId: " + getuserId() + ", roomId: " + getroomId() + " , day: " + getDay().toDate();
+		return "userId: " + getUserId() + ", roomId: " + getRoomId();
+	}
+
+}
