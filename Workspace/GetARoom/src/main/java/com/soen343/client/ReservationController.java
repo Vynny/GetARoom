@@ -88,10 +88,12 @@ public class ReservationController {
 		    }
 		    
 		    returnMap.put("message", "Reservation made!");
+		    returnMap.put("reservationMade", "true");
 		    
     	} else {
         	logger.info("User over reservation limit from message: \n\t" + message);
-        	returnMap.put("message", "Limit of " + maxActiveReservations + " reached!");
+        	returnMap.put("message", "Limit of " + maxActiveReservations + " Reservations Reached!");
+        	returnMap.put("reservationMade", "false");
     	}
     	
 	    return returnMap ;

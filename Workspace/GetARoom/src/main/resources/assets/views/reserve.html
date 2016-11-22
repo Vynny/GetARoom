@@ -27,7 +27,7 @@
                   <h3>End Time: {{endTime}}</h3>
                 </div>
                 <div id="reserve-confirm" class="col-md-4">
-                  <button ng-click="confirmReservation()" type="button" ng-class="withinTimeslotLimit ? 'btn btn-success btn-lg btn-block' : 'btn btn-danger btn-lg btn-block'">{{buttonText}}</button>
+                  <button ng-click="confirmReservation()" type="button" ng-class="validReservation ? 'btn btn-success btn-lg btn-block' : 'btn btn-danger btn-lg btn-block'">{{buttonText}}</button>
                 </div>
             </div>
           </div>
