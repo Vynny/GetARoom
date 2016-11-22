@@ -51,8 +51,10 @@ public class ReservationController {
     public ReservationModificationMessage modifyReservation(ReservationModificationMessage message) {
     	logger.info("Modifying reservation with message: \n\t" + message);
     	
+    	Reservation current = reservationMapper.get(message.getId());
+    	
     	removeFromQueue(message.getId());
-    	List<Long> newParents = addToQueue(message.getStartTime(), message.getEndTime());    	
+    	List<Long> newParents = addToQueue(current.getroomId(), message.getStartTime(), message.getEndTime());    	
     	ReservationSession session = reservationSessionManager.getSessionByUserId(message.getUserId());
     	session.modifyReservation(message, !newParents.isEmpty());
     	
@@ -68,7 +70,7 @@ public class ReservationController {
     public ReservationMessage createReservation(ReservationMessage message) {
     	logger.info("Got message: \n\t" + message);
 
-    	List<Long> parents = addToQueue(message.getStartTime(), message.getEndTime());
+    	List<Long> parents = addToQueue(message.getRoomId(), message.getStartTime(), message.getEndTime());
     	ReservationSession session = reservationSessionManager.getSessionByUserId(message.getUserId());   
 	    long id = session.makeReservation(message, !parents.isEmpty());
 	    
@@ -147,13 +149,13 @@ public class ReservationController {
         }
     }
     
-    private List<Long> addToQueue(String startTime, String endTime) {    	
+    private List<Long> addToQueue(long roomId, String startTime, String endTime) {    	
     	Hashtable<Long, QueueNode> nodeTable = getGraph();
     	LinkedList<Long> parents = new LinkedList<Long>();
 
 		boolean known = false;
 		// Need to check against all reservations on roomday, they might not be in the queue
-    	for (Reservation res: reservationMapper.getAll()) {
+    	for (Reservation res: reservationMapper.getByRoom(roomId)) {
     		if (res.isCollision(startTime, endTime)) {    			
     			if (nodeTable.containsKey(res.getId())) {
     				// handle elements in the queue separately

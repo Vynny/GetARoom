@@ -160,7 +160,7 @@ angular.module('mainController', [])
         });
 
         $scope.confirmModify = function() {
-            ReservationService.modifyReservation(UserService.getCurrentUser().id, $stateParams.reservationId, $scope.startTimeObj, $scope.endTimeObj).then(function(r) {
+            ReservationService.modifyReservation(UserService.getCurrentUser().userId, $stateParams.reservationId, $scope.startTimeObj, $scope.endTimeObj).then(function(r) {
                 $timeout(function() {
                     $scope.destroyReservationSession();
                     $scope.sessionActive = false;

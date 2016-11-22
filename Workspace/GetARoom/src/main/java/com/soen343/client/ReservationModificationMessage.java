@@ -16,7 +16,7 @@ public class ReservationModificationMessage {
 	private String endTime;
 
 	@JsonCreator
-	public ReservationModificationMessage(@JsonProperty("id") Long id, @JsonProperty("userId") Long userId, @JsonProperty("startTime") String startTime, @JsonProperty("endTime") String endTime) {
+	public ReservationModificationMessage(@JsonProperty("reservationId") Long id, @JsonProperty("userId") Long userId, @JsonProperty("startTime") String startTime, @JsonProperty("endTime") String endTime) {
 		this.id = id;
 		this.userId = userId;
 		this.setStartTime(startTime);
@@ -40,7 +40,7 @@ public class ReservationModificationMessage {
 
 	@JsonProperty
 	public void setUserId(Long id) {
-		this.userId = userId;
+		this.userId = id;
 	}
 
 	@JsonProperty
