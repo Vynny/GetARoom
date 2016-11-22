@@ -143,6 +143,18 @@ public class ReservationController {
             throw new WebApplicationException(Response.Status.NO_CONTENT);
         }
     }
+    
+    @GET
+    @Timed
+    public List<Reservation> getReservations() {
+    	List<Reservation> reservations = reservationMapper.getAll();
+    	if (!reservations.isEmpty()) {
+            return reservations;
+        } else {
+            throw new WebApplicationException(Response.Status.NO_CONTENT);
+        }
+    }
+
     		
     @GET
     @Path("/getbyroom/{id}")
