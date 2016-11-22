@@ -33,10 +33,8 @@ public class RoomController {
 
 	private ReservationSessionManager reservationSessionManager;
 	private RoomMapper roomMapper;
-	private RoomTDG roomTDG;
 
 	public RoomController(RoomTDG roomTDG, ReservationSessionManager reservationSessionManager) {
-		this.roomTDG = roomTDG;
 		this.roomMapper = new RoomMapper(roomTDG);
 		this.reservationSessionManager = reservationSessionManager;
 	}

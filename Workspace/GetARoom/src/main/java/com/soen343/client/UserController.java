@@ -32,25 +32,11 @@ import jersey.repackaged.com.google.common.base.Throwables;
 public class UserController {
 	
 	private UserMapper userMapper;
-	private UserTDG userTDG;
     private final byte[] tokenSecret;
 
     public UserController(UserTDG userTDG, byte[] tokenSecret) {
-    	this.userTDG = userTDG;
     	this.tokenSecret = tokenSecret;
     	this.userMapper = new UserMapper(userTDG);
-    }
-    
-    @GET
-    @Path("/")
-    @Timed
-    public List<User> getAllUsers() {
-    	List<User> users = userMapper.getAll();
-    	if (users != null) {
-            return users;
-        } else {
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
-        }
     }
     
     @GET
