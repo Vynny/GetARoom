@@ -35,14 +35,18 @@ public class ReservationController {
 	
 	final Logger logger = LoggerFactory.getLogger(ReservationController.class);
 	
+	private long maxActiveReservations;
+	
 	private ReservationSessionManager reservationSessionManager;
 	private ReservationMapper reservationMapper;
 	private QueueNodeEdgeMapper queueNodeEdgeMapper;
 
-    public ReservationController(ReservationTDG reservationTDG, QueueNodeEdgeTDG queueNodeEdgeTDG, ReservationSessionManager reservationSessionManager) {
+    public ReservationController(ReservationTDG reservationTDG, QueueNodeEdgeTDG queueNodeEdgeTDG, ReservationSessionManager reservationSessionManager, long maxActiveReservations) {
     	reservationMapper = new ReservationMapper(reservationTDG);
     	queueNodeEdgeMapper = new QueueNodeEdgeMapper(queueNodeEdgeTDG);
     	this.reservationSessionManager = reservationSessionManager;
+    	this.maxActiveReservations = maxActiveReservations;
+    	logger.info("maxActiveReservations is: " + this.maxActiveReservations);
     }
     
     @POST

@@ -18,7 +18,10 @@ public class GetARoomConfiguration extends Configuration {
     @JsonProperty("database")
 	private DataSourceFactory database = new DataSourceFactory();
 	
-    @NotEmpty
+	@NotEmpty
+    private String maxActiveReservations;
+
+	@NotEmpty
     private String jwtTokenSecret = "H8oaVSO4H6edGOTtoL06MllJL1t7XHwoieruugqoiuewgf";
 
 	public DataSourceFactory getDataSourceFactory() {
@@ -32,4 +35,14 @@ public class GetARoomConfiguration extends Configuration {
     public byte[] getJwtTokenSecret() throws UnsupportedEncodingException {
         return jwtTokenSecret.getBytes("UTF-8");
     }
+
+    @JsonProperty
+	public String getMaxActiveReservations() {
+		return maxActiveReservations;
+	}
+
+    @JsonProperty
+	public void setMaxActiveReservations(String maxActiveReservations) {
+		this.maxActiveReservations = maxActiveReservations;
+	}
 }

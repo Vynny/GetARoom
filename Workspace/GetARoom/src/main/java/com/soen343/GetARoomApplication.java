@@ -10,6 +10,8 @@ import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.jose4j.keys.HmacKey;
 import org.skife.jdbi.v2.DBI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.toastshaman.dropwizard.auth.jwt.JwtAuthFilter;
@@ -34,6 +36,8 @@ import io.dropwizard.setup.Environment;
 import io.dropwizard.auth.*;
 
 public class GetARoomApplication extends Application<GetARoomConfiguration> {
+	
+	final Logger logger = LoggerFactory.getLogger(GetARoomApplication.class);
 
 	public static void main(final String[] args) throws Exception {
 		new GetARoomApplication().run(args);
@@ -50,7 +54,7 @@ public class GetARoomApplication extends Application<GetARoomConfiguration> {
 	}
 
 	@Override
-	public void run(final GetARoomConfiguration configuration, final Environment environment) throws Exception {
+	public void run(final GetARoomConfiguration configuration, final Environment environment) throws Exception {	
 		//Set root path to /api/*
 		((DefaultServerFactory) configuration.getServerFactory()).setJerseyRootPath("/api/*");
 
@@ -69,7 +73,7 @@ public class GetARoomApplication extends Application<GetARoomConfiguration> {
 		ReservationSessionManager reservationSessionManager = new ReservationSessionManager();
 		
 		RoomController roomController = new RoomController(roomTDG, reservationSessionManager);
-		ReservationController reservationController = new ReservationController(reservationTDG, queueNodeEdgeTDG, reservationSessionManager);
+		ReservationController reservationController = new ReservationController(reservationTDG, queueNodeEdgeTDG, reservationSessionManager, Long.parseLong(configuration.getMaxActiveReservations()));
 		UserController userController = new UserController(userTDG, configuration.getJwtTokenSecret());
 		
 		reservationSessionManager.setReservationController(reservationController);
