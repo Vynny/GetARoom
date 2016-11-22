@@ -192,6 +192,12 @@ public class ReservationController {
     				queueNodeEdgeMapper.remove(node.getReservationId(), child.getReservationId());
     				if (child.getParents().size() == 1) {
     	    			reservationMapper.removeFromWaitlist(child.getReservation());
+    	    			// remove colliding reservations from other rooms
+    	    			for (Reservation res : reservationMapper.getAll()) {
+    	    				if (res.getroomId() != child.getReservation().getroomId() && res.isCollision(child.getReservation().getStart_time(), child.getReservation().getEnd_time())) {
+    	    					cancelReservation(res.getId());
+    	    				}
+    	    			}
     				}
     			}
     		} else {
@@ -212,6 +218,15 @@ public class ReservationController {
     				}
     				if (!collision) {
     	    			reservationMapper.removeFromWaitlist(child.getReservation());
+    	    			// remove colliding reservations from other rooms
+        				if (child.getParents().size() == 1) {
+        	    			reservationMapper.removeFromWaitlist(child.getReservation());
+        	    			for (Reservation res : reservationMapper.getAll()) {
+        	    				if (res.getroomId() != child.getReservation().getroomId() && res.isCollision(child.getReservation().getStart_time(), child.getReservation().getEnd_time())) {
+        	    					cancelReservation(res.getId());
+        	    				}
+        	    			}
+        				}
     				}
     			}
     		}
