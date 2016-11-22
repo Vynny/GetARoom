@@ -321,7 +321,7 @@ angular.module('mainController', [])
     }).controller('ReserveCtrl', function($scope, $state, $resource, $stateParams, $timeout, RoomService, ReservationService, UserService) {
         //Controller for single room page, reserve
         $scope.buttonText = "Reserve";
-        $scope.withinTimeslotLimit = true;
+        $scope.validReservation = true;
         $scope.counter = 4;
         $scope.counterTimeout;
 
@@ -355,24 +355,30 @@ angular.module('mainController', [])
             $scope.hideReservationView = false;
 
             if (!ReservationService.isWithinAllowableTime(start, end)) {
-                $scope.withinTimeslotLimit = false;
+                $scope.validReservation = false;
                 $scope.buttonText = "Reservation Exceeds " + ReservationService.maxReservationTime() + " hours!";
             } else {
-                $scope.withinTimeslotLimit = true;
+                $scope.validReservation = true;
                 $scope.buttonText = "Reserve";
             }
         };
 
         $scope.confirmReservation = function() {
-            if ($scope.withinTimeslotLimit) {
+            if ($scope.validReservation) {
                 ReservationService.createReservation(UserService.getCurrentUser().userId, $scope.thisroom.id, $scope.startTimeObj.format(), $scope.endTimeObj.format()).then(function(response) {
                     console.log(JSON.stringify(response));
+                    if (response.data.reservationMade == "false") {
+                        $scope.validReservation = false;
+                        $scope.buttonText = response.data.message;
+                    } else {
+                        $scope.validReservation = true;
+                        $scope.counterTimeout = $timeout($scope.countdown, 0);
+                        $timeout(function() {
+                            $state.go('rooms.room');
+                            $scope.destroyReservationSession();
+                        }, 4000)
+                    }
                 });
-                $scope.counterTimeout = $timeout($scope.countdown, 0);
-                $timeout(function() {
-                    $state.go('rooms.room');
-                    $scope.destroyReservationSession();
-                }, 4000)
             }
         }
 
