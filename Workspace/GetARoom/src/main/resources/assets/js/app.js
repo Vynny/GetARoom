@@ -2,6 +2,8 @@
     var app = angular.module('app', ['ui.router', 'ngAnimate', 'ui.bootstrap', 'ngResource', 'ui.calendar', 'getaroom.services', 'mainController', 'ngStorage'])
     
     //Global API Source URL
+    //Change to line below for local testing
+    //var apisrc = "http://localhost:8080"
     var apisrc = "http://getaroom.lvain.com";
 
     app.config(function($stateProvider, $urlRouterProvider, $controllerProvider) {

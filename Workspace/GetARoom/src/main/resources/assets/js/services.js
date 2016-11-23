@@ -5,6 +5,7 @@ angular.module('getaroom.services', ['app'])
 
     var allRooms = $localStorage.rooms;
 
+    //Time range for calendar plugin, will only display times from minTimeDuration to maxTimeDuration
     var minTimeDuration = moment.duration('07:00:00');
     var maxTimeDuration = moment.duration('22:00:00');
     var minTimeString = "07:00";
@@ -56,7 +57,6 @@ angular.module('getaroom.services', ['app'])
         }
     };
 }]).factory('UserService', ['$rootScope', '$localStorage', '$http', function($rootScope, $localStorage, $http) {
-    //var currentUser = $localStorage.currentUser;
 
     return {
         authenticateUser: function(username, password) {
@@ -86,10 +86,11 @@ angular.module('getaroom.services', ['app'])
             return $http.get($rootScope.apisrc + '/api/user/' + userId);
         }
     };
-}]).factory('ReservationService', ['$rootScope', '$localStorage', '$http', '$q', function($rootScope, $localStorage, $http, $q) {
-    // var currentUser = $localStorage.currentUser;
-    //console.log(currentUser);
+}]).factory('ReservationService', ['$rootScope', '$localStorage', '$http', function($rootScope, $localStorage, $http) {
+
+    //Maximum amount of hours a user can reserve at a time
     var maxReservationTime = 3;
+
     return {
         verifyReservationSession: function(userId, roomId, day) {
             return $http.post($rootScope.apisrc + '/api/room/verifyReservationSession', { userId: userId, roomId: roomId, day: day.format('YYYY-MM-DD') });
