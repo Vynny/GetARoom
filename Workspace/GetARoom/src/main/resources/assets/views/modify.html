@@ -26,7 +26,7 @@
                 <h3>End Time: {{endTime}}</h3>
               </div>
               <div id="reserve-confirm" class="col-md-4">
-                <button ng-click="confirmModify()" type="button" ng-class="withinTimeslotLimit ? 'btn btn-success btn-lg btn-block' : 'btn btn-danger btn-lg btn-block'">{{modifyButtonText}}</button>
+                <button ng-click="confirmModify()" type="button" ng-class="validModification ? 'btn btn-success btn-lg btn-block' : 'btn btn-danger btn-lg btn-block'">{{modifyButtonText}}</button>
               </div>
               <div class="col-md-12">
               <button id="modpage-deletebutton" ng-click="confirmDelete()" type="button" class="btn btn-danger btn-lg btn-block">{{deleteButtonText}}</button>

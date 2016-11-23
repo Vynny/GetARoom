@@ -61,14 +61,14 @@ public class ReservationController {
     	
     	if (current == null) {
     		returnMap.put("message", "Trying to modify null reservation.");
-		    returnMap.put("selfOverlap", "false");
+    		returnMap.put("reservationModified", "false");
     	}
     	else {
 	    	List<Long> newParents = addToQueue(current.getuserId(), current.getroomId(), message.getStartTime(), message.getEndTime());   
 	    	// special case for overlap with same user reservation
 	    	if (newParents.contains((long)-1)) {
 	    		returnMap.put("message", "User reservation self-overlap.");
-			    returnMap.put("selfOverlap", "true");
+	    		returnMap.put("reservationModified", "false");
 	    	}
 	    	else {
 		    	removeFromQueue(message.getId());
@@ -79,7 +79,7 @@ public class ReservationController {
 			    	queueNodeEdgeMapper.makeNew(i, message.getId());
 			    }
 			    returnMap.put("message", "Reservation modified!");
-			    returnMap.put("selfOverlap", "false");
+			    returnMap.put("reservationModified", "true");
 	    	}
     	}
     	
@@ -99,6 +99,7 @@ public class ReservationController {
 	    	// special case for overlap with same user reservation
 	    	if (parents.contains((long)-1)) {
 	    		returnMap.put("message", "User reservation self-conflict.");
+	    		returnMap.put("reservationMade", "false");
 	    	}
 	    	else {
 		    	ReservationSession session = reservationSessionManager.getSessionByUserId(message.getUserId());   

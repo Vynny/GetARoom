@@ -54,17 +54,28 @@ angular.module('mainController', [])
 
         ReservationService.getByUser(UserService.getCurrentUser().userId).then(function(response) {
             response.data.forEach(function(reservationItem) {
-                $scope.userReservations.push({
-                    id: reservationItem.id,
-                    roomId: reservationItem.roomId,
-                    roomDescription: RoomService.getRoomDescription(reservationItem.roomId),
-                    day: moment(reservationItem.start_time).format('MMM Do'),
-                    startTime: moment(reservationItem.start_time).format('h:mm a'),
-                    endTime: moment(reservationItem.end_time).format('h:mm a'),
-                    dayObj: moment(reservationItem.start_time),
-                    canModify: true,
-                    text: "Modify"
+                ReservationService.getWaitlistPosition(reservationItem.id).then(function(position) {
+                    var waitlistPosition;
+                    if (position.data == 0) {
+                        waitlistPosition = "N/A";
+                    } else {
+                        waitlistPosition = position.data;
+                    }
+
+                    $scope.userReservations.push({
+                        id: reservationItem.id,
+                        roomId: reservationItem.roomId,
+                        roomDescription: RoomService.getRoomDescription(reservationItem.roomId),
+                        position: waitlistPosition,
+                        day: moment(reservationItem.start_time).format('MMM Do'),
+                        startTime: moment(reservationItem.start_time).format('h:mm a'),
+                        endTime: moment(reservationItem.end_time).format('h:mm a'),
+                        dayObj: moment(reservationItem.start_time),
+                        canModify: true,
+                        text: "Modify"
+                    });
                 });
+
             })
         });
 
@@ -95,7 +106,7 @@ angular.module('mainController', [])
         $scope.deleteButtonText = "Cancel Reservation";
 
         $scope.sessionActive = true;
-        $scope.withinTimeslotLimit = true;
+        $scope.validModification = true;
 
         $scope.startTime;
         $scope.endTime;
@@ -162,11 +173,17 @@ angular.module('mainController', [])
 
         $scope.confirmModify = function() {
             ReservationService.modifyReservation(UserService.getCurrentUser().userId, $stateParams.reservationId, $scope.startTimeObj, $scope.endTimeObj).then(function(r) {
-                $timeout(function() {
-                    $scope.destroyReservationSession();
-                    $scope.sessionActive = false;
-                    $state.go('userpanel');
-                }, 1500)
+
+                if (r.data.reservationModified == "false") {
+                    $scope.validModification = false;
+                    $scope.modifyButtonText = r.data.message;
+                } else {
+                    $timeout(function() {
+                        $scope.destroyReservationSession();
+                        $scope.sessionActive = false;
+                        $state.go('userpanel');
+                    }, 1250)
+                }
             });
         };
 
@@ -185,10 +202,10 @@ angular.module('mainController', [])
             $scope.endTimeObj = event.end;
 
             if (!ReservationService.isWithinAllowableTime(event.start, event.end)) {
-                $scope.withinTimeslotLimit = false;
+                $scope.validModification = false;
                 $scope.modifyButtonText = "Reservation Exceeds " + ReservationService.maxReservationTime() + " hours!";
             } else {
-                $scope.withinTimeslotLimit = true;
+                $scope.validModification = true;
                 $scope.modifyButtonText = "Confirm Modification";
             }
         };

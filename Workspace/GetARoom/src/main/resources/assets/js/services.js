@@ -47,10 +47,10 @@ angular.module('getaroom.services', ['app'])
         },
         getMaxTime: function() {
             return maxTimeDuration;
-        }, 
+        },
         getMinTimeString: function() {
             return minTimeString;
-        }, 
+        },
         getMaxTimeString: function() {
             return maxTimeString;
         }
@@ -86,7 +86,7 @@ angular.module('getaroom.services', ['app'])
             return $http.get($rootScope.apisrc + '/api/user/' + userId);
         }
     };
-}]).factory('ReservationService', ['$rootScope', '$localStorage', '$http', function($rootScope, $localStorage, $http) {
+}]).factory('ReservationService', ['$rootScope', '$localStorage', '$http', '$q', function($rootScope, $localStorage, $http, $q) {
     // var currentUser = $localStorage.currentUser;
     //console.log(currentUser);
     var maxReservationTime = 3;
@@ -115,8 +115,11 @@ angular.module('getaroom.services', ['app'])
         getByUser: function(userId) {
             return $http.get($rootScope.apisrc + '/api/reservation/getbyuser/' + userId);
         },
+        getWaitlistPosition: function(reservationId) {
+            return $http.get($rootScope.apisrc + '/api/reservation/' + reservationId + '/position');
+        },
         isWithinAllowableTime: function(start, end) {
-            if  (moment.duration(end.diff(start)).asHours() > maxReservationTime)
+            if (moment.duration(end.diff(start)).asHours() > maxReservationTime)
                 return false;
             return true;
         },

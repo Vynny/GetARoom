@@ -25,7 +25,7 @@
            <tr>
             <th>#</th>
             <th>Room</th>
-            <th>Position</th>
+            <th>Waitlist <br> Position</th>
             <th>Day</th>
             <th>Start Time</th>
             <th>End Time</th>
@@ -37,7 +37,7 @@
           <tr ng-repeat = "reservationItem in userReservations" class="td-userpanel">
             <td>{{reservationItem.id}}</td>
             <td><a ui-sref="rooms.room({ id: reservationItem.roomId })"> {{reservationItem.roomDescription}}</a></td>
-            <td></td>
+            <td>{{reservationItem.position}}</td>
             <td>{{reservationItem.day}}</td>
             <td>{{reservationItem.startTime}}</td>
             <td>{{reservationItem.endTime}}</td>
