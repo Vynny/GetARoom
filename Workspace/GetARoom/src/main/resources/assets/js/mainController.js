@@ -9,13 +9,13 @@ angular.module('mainController', [])
             console.log($scope.username);
         }
 
+        //Sets scope username when UserService broadcasts login-success event.
         $rootScope.$on('login-success', function() {
             $scope.username = UserService.getCurrentUser().username;
             console.log($scope.username);
         });
 
-        // returns true if the current router url matches the passed in url
-        // so views can set 'active' on links easily
+        //Used to set active links easily
         $scope.isUrl = function(url) {
             if (url === '#') return false;
             return ('#' + $state.$current.url.source + '/').indexOf(url + '/') === 0;
@@ -121,51 +121,28 @@ angular.module('mainController', [])
             console.log(response);
             if (response.status !== 204) {
                 response.data.forEach(function(reservation) {
-                    console.log("Got: " + JSON.stringify(reservation));
-                    var username;
                     UserService.getUsername(reservation.userId).then(function(r) {
-                        username = r.data.username;
+                        var resToEdit = {};
+                        resToEdit.title = r.data.username;
+                        resToEdit.start = moment(reservation.start_time);
+                        resToEdit.end = moment(reservation.end_time);
+
+                        if (reservation.waitlisted) {
+                            ReservationService.getWaitlistPosition(reservation.id).then(function(response) {
+                                resToEdit.title += "\n Waitlist Position: " + response.data;
+                            });
+                            resToEdit.backgroundColor = '#e67e22';
+                            resToEdit.borderColor = '#e67e22';
+                        }
+
                         if ($stateParams.reservationId == reservation.id) {
-                            var resToEdit;
-                            if (!reservation.waitlisted) {
-                                resToEdit = {
-                                    title: username,
-                                    start: moment(reservation.start_time),
-                                    end: moment(reservation.end_time),
-                                    editable: true
-                                };
-                            } else {
-                                var resToEdit = {
-                                    title: username,
-                                    start: moment(reservation.start_time),
-                                    end: moment(reservation.end_time),
-                                    editable: true,
-                                    backgroundColor: '#e67e22',
-                                    borderColor: '#e67e22'
-                                };
-                            }
-                            $scope.events.push(resToEdit);
-                            $scope.startTime = resToEdit.start.format('lll');
-                            $scope.endTime = resToEdit.end.format('lll');
-                        } else {
-                            if (!reservation.waitlisted) {
-                                $scope.events.push({
-                                    title: username,
-                                    start: moment(reservation.start_time),
-                                    end: moment(reservation.end_time)
-                                });
-                            } else {
-                                $scope.events.push({
-                                    title: username,
-                                    start: moment(reservation.start_time),
-                                    end: moment(reservation.end_time),
-                                    backgroundColor: '#e67e22',
-                                    borderColor: '#e67e22'
-                                });
-                            }
+                            resToEdit.editable = true;
 
                         }
 
+                        $scope.events.push(resToEdit);
+                        $scope.startTime = resToEdit.start.format('lll');
+                        $scope.endTime = resToEdit.end.format('lll');
                     });
                 });
             }
@@ -266,27 +243,19 @@ angular.module('mainController', [])
             console.log(response);
             if (response.status !== 204) {
                 response.data.forEach(function(reservation) {
-                    console.log("Got: " + JSON.stringify(reservation));
-                    var username;
-
                     UserService.getUsername(reservation.userId).then(function(r) {
-                        username = r.data.username;
-                        console.log("username is " + username);
-                        if (!reservation.waitlisted) {
-                            $scope.events.push({
-                                title: username,
-                                start: moment(reservation.start_time),
-                                end: moment(reservation.end_time)
-                            })
-                        } else {
-                            $scope.events.push({
-                                title: username,
-                                start: moment(reservation.start_time),
-                                end: moment(reservation.end_time),
-                                backgroundColor: '#e67e22',
-                                borderColor: '#e67e22'
-                            })
-                        }
+                        var event = {};
+                        event.title = r.data.username;
+                        event.start = moment(reservation.start_time);
+                        event.end = moment(reservation.end_time);
+                        if (reservation.waitlisted) {
+                            ReservationService.getWaitlistPosition(reservation.id).then(function(response) {
+                                event.title += "\n Waitlist Position: " + response.data;
+                            });
+                            event.backgroundColor = '#e67e22';
+                            event.borderColor = '#e67e22';
+                        } 
+                        $scope.events.push(event);
                     });
                 });
             }
@@ -335,7 +304,6 @@ angular.module('mainController', [])
             }
         };
 
-
     }).controller('ReserveCtrl', function($scope, $state, $resource, $stateParams, $timeout, RoomService, ReservationService, UserService) {
         //Controller for single room page, reserve
         $scope.buttonText = "Reserve";
@@ -353,8 +321,6 @@ angular.module('mainController', [])
         $scope.hideReservationView = true;
 
         $scope.thisroom = RoomService.getCurrentRoom();
-        console.log("This room: " + JSON.stringify($scope.thisroom));
-        console.log("User id is: " + UserService.getCurrentUser().userId);
         $scope.events = $stateParams.events;
         $scope.eventSources = [$scope.events];
 

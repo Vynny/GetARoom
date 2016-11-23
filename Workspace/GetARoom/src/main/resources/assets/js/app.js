@@ -1,6 +1,8 @@
 (function() {
     var app = angular.module('app', ['ui.router', 'ngAnimate', 'ui.bootstrap', 'ngResource', 'ui.calendar', 'getaroom.services', 'mainController', 'ngStorage'])
-    var apisrc = "http://localhost:8080";
+    
+    //Global API Source URL
+    var apisrc = "http://getaroom.lvain.com";
 
     app.config(function($stateProvider, $urlRouterProvider, $controllerProvider) {
             var origController = app.controller
@@ -11,11 +13,10 @@
 
             var viewsPrefix = 'views/';
 
-            // For any unmatched url, send to /
+            // Unmatched URL Default Page
             $urlRouterProvider.otherwise("/")
 
             $stateProvider
-            // you can set this to no template if you just want to use the html in the page
                 .state('home', {
                     url: "/",
                     templateUrl: viewsPrefix + "home.html",
@@ -98,20 +99,6 @@
                     data: {
                         pageTitle: 'Log In',
                         apisrc: apisrc
-                    }
-                })
-                .state('theme', {
-                    url: "/theme",
-                    templateUrl: viewsPrefix + "theme.html",
-                    data: {
-                        pageTitle: 'Theme Example'
-                    }
-                })
-                .state('ui', {
-                    url: "/ui",
-                    templateUrl: viewsPrefix + "ui.html",
-                    data: {
-                        pageTitle: 'UI'
                     }
                 })
         }).run(function($rootScope, $http, $location, $localStorage) {

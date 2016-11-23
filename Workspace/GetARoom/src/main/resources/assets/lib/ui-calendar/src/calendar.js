@@ -320,7 +320,9 @@ angular.module('ui.calendar', [])
 
                     eventsWatcher.onAdded = function (event) {
                         if (calendar && calendar.fullCalendar) {
-                            calendar.fullCalendar('renderEvent', event, !!event.stick);
+                            //Changed to prevent events from being wiped when changing months.
+                            calendar.fullCalendar('renderEvent', event, true);
+                            //calendar.fullCalendar('renderEvent', event, !!event.stick);
                         }
                     };
 
