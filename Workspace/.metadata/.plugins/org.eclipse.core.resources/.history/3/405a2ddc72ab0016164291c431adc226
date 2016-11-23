@@ -1,7 +1,0 @@
-package com.soen343.uow;
-
-public interface DomainObject {
-
-	public long getId();
-
-}

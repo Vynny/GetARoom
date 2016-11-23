@@ -1,5 +1,0 @@
-package com.soen343.mappers;
-
-public class ReservationIdentityMap extends IdentityMap {
-
-}
