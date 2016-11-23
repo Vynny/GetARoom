@@ -54,21 +54,36 @@ public class ReservationController {
     @POST
     @Path("/modify")
     @Timed
-    public ReservationModificationMessage modifyReservation(ReservationModificationMessage message) {
+    public Map<String, String> modifyReservation(ReservationModificationMessage message) {
     	logger.info("Modifying reservation with message: \n\t" + message);
-    	
+	    HashMap<String, String> returnMap = new HashMap<String, String>();
     	Reservation current = reservationMapper.get(message.getId());
     	
-    	removeFromQueue(message.getId());
-    	List<Long> newParents = addToQueue(current.getroomId(), message.getStartTime(), message.getEndTime());    	
-    	ReservationSession session = reservationSessionManager.getSessionByUserId(message.getUserId());
-    	session.modifyReservation(message, !newParents.isEmpty());
+    	if (current == null) {
+    		returnMap.put("message", "Trying to modify null reservation.");
+		    returnMap.put("selfOverlap", "false");
+    	}
+    	else {
+	    	List<Long> newParents = addToQueue(current.getuserId(), current.getroomId(), message.getStartTime(), message.getEndTime());   
+	    	// special case for overlap with same user reservation
+	    	if (newParents.contains((long)-1)) {
+	    		returnMap.put("message", "User reservation self-overlap.");
+			    returnMap.put("selfOverlap", "true");
+	    	}
+	    	else {
+		    	removeFromQueue(message.getId());
+		    	ReservationSession session = reservationSessionManager.getSessionByUserId(message.getUserId());
+		    	session.modifyReservation(message, !newParents.isEmpty());
+		    	
+			    for (long i : newParents) {
+			    	queueNodeEdgeMapper.makeNew(i, message.getId());
+			    }
+			    returnMap.put("message", "Reservation modified!");
+			    returnMap.put("selfOverlap", "false");
+	    	}
+    	}
     	
-	    for (long i : newParents) {
-	    	queueNodeEdgeMapper.makeNew(i, message.getId());
-	    }
-    	
-    	return message;   	
+    	return returnMap;   	
     }
     
     @POST
@@ -79,16 +94,23 @@ public class ReservationController {
     	if (reservationMapper.getUserReservationPermitted(message.getUserId(), maxActiveReservations)) {
         	logger.info("Adding message: \n\t" + message);
 
-	    	List<Long> parents = addToQueue(message.getRoomId(), message.getStartTime(), message.getEndTime());
-	    	ReservationSession session = reservationSessionManager.getSessionByUserId(message.getUserId());   
-		    long id = session.makeReservation(message, !parents.isEmpty());
-		    
-		    for (long i : parents) {
-		    	queueNodeEdgeMapper.makeNew(i, id);
-		    }
-		    
-		    returnMap.put("message", "Reservation made!");
-		    returnMap.put("reservationMade", "true");
+	    	List<Long> parents = addToQueue(message.getUserId(), message.getRoomId(), message.getStartTime(), message.getEndTime());
+	    	
+	    	// special case for overlap with same user reservation
+	    	if (parents.contains((long)-1)) {
+	    		returnMap.put("message", "User reservation self-conflict.");
+	    	}
+	    	else {
+		    	ReservationSession session = reservationSessionManager.getSessionByUserId(message.getUserId());   
+			    long id = session.makeReservation(message, !parents.isEmpty());
+			    
+			    for (long i : parents) {
+			    	queueNodeEdgeMapper.makeNew(i, id);
+			    }
+			    
+			    returnMap.put("message", "Reservation made!");
+			    returnMap.put("reservationMade", "true");
+	    	}
 		    
     	} else {
         	logger.info("User over reservation limit from message: \n\t" + message);
@@ -180,15 +202,18 @@ public class ReservationController {
         }
     }
     
-    private List<Long> addToQueue(long roomId, String startTime, String endTime) {    	
+    private List<Long> addToQueue(long userId, long roomId, String startTime, String endTime) {    	
     	Hashtable<Long, QueueNode> nodeTable = getGraph();
     	LinkedList<Long> parents = new LinkedList<Long>();
 
 		boolean known = false;
 		// Need to check against all reservations on roomday, they might not be in the queue
     	for (Reservation res: reservationMapper.getByRoom(roomId)) {
-    		if (res.isCollision(startTime, endTime)) {    			
-    			if (nodeTable.containsKey(res.getId())) {
+    		if (res.isCollision(startTime, endTime)) {  
+    			if (userId == res.getuserId()) {
+    				parents.add((long) -1);
+    			}
+    			else if (nodeTable.containsKey(res.getId())) {
     				// handle elements in the queue separately
     				known = true;
     			}
