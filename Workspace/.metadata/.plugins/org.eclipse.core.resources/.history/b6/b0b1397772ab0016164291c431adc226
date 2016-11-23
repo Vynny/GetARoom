@@ -1,0 +1,7 @@
+package com.soen343.mappers;
+
+import com.soen343.idmappers.IdentityMap;
+
+public class ReservationIdentityMap extends IdentityMap {
+
+}

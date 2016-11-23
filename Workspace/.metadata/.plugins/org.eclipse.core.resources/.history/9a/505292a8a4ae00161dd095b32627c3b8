@@ -1,0 +1,87 @@
+package com.soen343.client;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class ReservationMessage {
+
+	private Long userId;
+	private Long roomId;
+	//private DateTime startTime;
+	//private DateTime endTime;
+	private String startTime;
+	private String endTime;
+
+	@JsonCreator
+	public ReservationMessage(@JsonProperty("userId") Long userId, @JsonProperty("roomId") Long roomId,
+			@JsonProperty("startTime") String startTime, @JsonProperty("endTime") String endTime) {
+		this.setUserId(userId);
+		this.setRoomId(roomId);
+		//setStartTime(DateTime.parse(startTime, ISODateTimeFormat.dateHourMinute()));
+		//setEndTime(DateTime.parse(endTime, ISODateTimeFormat.dateHourMinute()));
+	}
+
+	@JsonProperty
+	public Long getUserId() {
+		return userId;
+	}
+
+	@JsonProperty
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	@JsonProperty
+	public Long getRoomId() {
+		return roomId;
+	}
+
+	@JsonProperty
+	public void setRoomId(Long roomId) {
+		this.roomId = roomId;
+	}
+
+	/*@JsonProperty
+	public DateTime getStartTime() {
+		return startTime;
+	}
+
+	@JsonProperty
+	public void setStartTime(DateTime startTime) {
+		this.startTime = startTime;
+	}
+
+	@JsonProperty
+	public DateTime getEndTime() {
+		return endTime;
+	}
+
+	@JsonProperty
+	public void setEndTime(DateTime endTime) {
+		this.endTime = endTime;
+	}*/
+	
+	public String toString() {
+		return "userId: " + getUserId() + ", roomId: " + getRoomId() + ", startTime: " + getStartTime() + ", endTime: " + getEndTime();
+	}
+	@JsonCreator
+	public String getStartTime() {
+		return startTime;
+	}
+	@JsonCreator
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+	@JsonCreator
+	public String getEndTime() {
+		return endTime;
+	}
+	@JsonCreator
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
+	}
+
+}
