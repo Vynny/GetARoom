@@ -63,8 +63,12 @@ public class ReservationController {
     		returnMap.put("message", "Trying to modify null reservation.");
     		returnMap.put("reservationModified", "false");
     	}
+    	else if (message.getStartTime() == null || message.getEndTime() == null) {
+    		returnMap.put("message", "Nothing to modify.");
+    		returnMap.put("reservationModified", "false");
+    	}
     	else {
-	    	List<Long> newParents = addToQueue(current.getuserId(), current.getroomId(), message.getStartTime(), message.getEndTime());   
+	    	List<Long> newParents = addToQueue(current.getId(), current.getuserId(), current.getroomId(), message.getStartTime(), message.getEndTime());   
 	    	// special case for overlap with same user reservation
 	    	if (newParents.contains((long)-1)) {
 	    		returnMap.put("message", "User reservation self-overlap.");
@@ -94,7 +98,7 @@ public class ReservationController {
     	if (reservationMapper.getUserReservationPermitted(message.getUserId(), maxActiveReservations)) {
         	logger.info("Adding message: \n\t" + message);
 
-	    	List<Long> parents = addToQueue(message.getUserId(), message.getRoomId(), message.getStartTime(), message.getEndTime());
+	    	List<Long> parents = addToQueue((long)-1, message.getUserId(), message.getRoomId(), message.getStartTime(), message.getEndTime());
 	    	
 	    	// special case for overlap with same user reservation
 	    	if (parents.contains((long)-1)) {
@@ -203,7 +207,7 @@ public class ReservationController {
         }
     }
     
-    private List<Long> addToQueue(long userId, long roomId, String startTime, String endTime) {    	
+    private List<Long> addToQueue(long reservationId, long userId, long roomId, String startTime, String endTime) {    	
     	Hashtable<Long, QueueNode> nodeTable = getGraph();
     	LinkedList<Long> parents = new LinkedList<Long>();
 
@@ -211,7 +215,11 @@ public class ReservationController {
 		// Need to check against all reservations on roomday, they might not be in the queue
     	for (Reservation res: reservationMapper.getByRoom(roomId)) {
     		if (res.isCollision(startTime, endTime)) {  
-    			if (userId == res.getuserId()) {
+    			if (reservationId == res.getId()) {
+    				// checking against self, don't associate
+    			}
+    			else if (userId == res.getuserId()) {
+    				// disallow reservation with conflict against same userid
     				parents.add((long) -1);
     			}
     			else if (nodeTable.containsKey(res.getId())) {
@@ -251,7 +259,8 @@ public class ReservationController {
     	    			reservationMapper.removeFromWaitlist(child.getReservation());
     	    			// remove colliding reservations from other rooms
     	    			for (Reservation res : reservationMapper.getAll()) {
-    	    				if (res.getroomId() != child.getReservation().getroomId() && res.isCollision(child.getReservation().getStart_time(), child.getReservation().getEnd_time())) {
+    	    				if (res.getroomId() != child.getReservation().getroomId() &&
+    	    						res.isCollision(child.getReservation().getStart_time(), child.getReservation().getEnd_time())) {
     	    					cancelReservation(res.getId());
     	    				}
     	    			}
@@ -279,7 +288,8 @@ public class ReservationController {
         				if (child.getParents().size() == 1) {
         	    			reservationMapper.removeFromWaitlist(child.getReservation());
         	    			for (Reservation res : reservationMapper.getAll()) {
-        	    				if (res.getroomId() != child.getReservation().getroomId() && res.isCollision(child.getReservation().getStart_time(), child.getReservation().getEnd_time())) {
+        	    				if (res.getroomId() != child.getReservation().getroomId() &&
+        	    						res.isCollision(child.getReservation().getStart_time(), child.getReservation().getEnd_time())) {
         	    					cancelReservation(res.getId());
         	    				}
         	    			}
