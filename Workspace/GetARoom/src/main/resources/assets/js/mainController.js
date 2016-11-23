@@ -94,6 +94,7 @@ angular.module('mainController', [])
         $scope.modifyButtonText = "Confirm Modification";
         $scope.deleteButtonText = "Cancel Reservation";
 
+        $scope.sessionActive = true;
         $scope.withinTimeslotLimit = true;
 
         $scope.startTime;
@@ -228,7 +229,7 @@ angular.module('mainController', [])
                 $scope.destroyReservationSession();
         });
     }).controller('RoomsCtrl', function($scope, $state, $resource, Room) {
-        //Controller for all rooms page 
+        //Controller for all rooms page, this is dead but wasn't removed lol sry
     }).controller('RoomCtrl', function($scope, $state, $resource, id, RoomService, ReservationService, UserService) {
         //Controller for single room page, view
         $scope.id = id;
