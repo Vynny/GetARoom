@@ -1,6 +1,6 @@
 # GetARoom
 
-# About
+## About
 GetARoom is a room reservation system built with Dropwizard and AngularJS. It was built as a SOEN 343 Project in fall 2016.
 
 
