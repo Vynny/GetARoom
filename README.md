@@ -1,12 +1,10 @@
 # GetARoom
 
 # About
----
 GetARoom is a room reservation system built with Dropwizard and AngularJS. It was built as a SOEN 343 Project in fall 2016.
 
 
 ## How to start the GetARoom application locally
----
 
 1. In src/main/resources/assets/js/app.js, make sure apisrc is set to 'http://localhost:8080'
 2. Run `mvn clean install` to build your application
@@ -17,7 +15,6 @@ GetARoom is a room reservation system built with Dropwizard and AngularJS. It wa
 
 
 ## Dynamic Configuration
----
 
 1. Calendar timerange - src/main/resources/assets/js/services.js, RoomService
 2. Maximum amount of reservable timeslots per reservation - src/main/resources/assets/js/services.js, ReservationService
@@ -25,7 +22,7 @@ GetARoom is a room reservation system built with Dropwizard and AngularJS. It wa
 
 
 ## Team Members
----
+
 - Mihai Damaschin
 - Jesus Imery
 - Meetaz Alshbli
