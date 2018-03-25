@@ -3,8 +3,7 @@
     
     //Global API Source URL
     //Change to line below for local testing
-    //var apisrc = "http://localhost:8080"
-    var apisrc = "http://getaroom.lvain.com";
+    var apisrc = "http://localhost:8080"
 
     app.config(function($stateProvider, $urlRouterProvider, $controllerProvider) {
             var origController = app.controller

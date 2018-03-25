@@ -6,10 +6,10 @@ database:
   driverClass: com.mysql.jdbc.Driver
 
   # the username
-  user: soen343
+  user: getaroom
 
   # the password
-  password: soen343
+  password: getaroom
 
   # the JDBC URL
   url: jdbc:mysql://localhost/getaroom
